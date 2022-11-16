@@ -9,6 +9,8 @@ CREATE TABLE "Problem" (
     "difficulty" "ProblemDifficulty" NOT NULL DEFAULT 'Medium',
     "solution" TEXT NOT NULL,
     "constraints" TEXT[],
+    "inputs" JSONB NOT NULL,
+    "outputs" JSONB NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

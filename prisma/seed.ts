@@ -1,44 +1,41 @@
-import { PrismaClient } from '@prisma/client';
+// import { Prisma, PrismaClient } from '@prisma/client';
 
-// initialize Prisma Client
-const prisma = new PrismaClient();
+// // initialize Prisma Client
+// const prisma = new PrismaClient();
 
-async function main(): Promise<void> {
-	// create two dummy articles
-	const problem1 = await prisma.problem.upsert({
-		where: { title: 'Four sum' },
-		update: {},
-		create: {
-			title: 'Four sum',
-			description: 'Some dummy information,Some dummy information,Some dummy information.',
-			difficulty: 'Easy',
-			solution: 'This a solution.',
-			constraints: ['a < b', 'b == 0'],
-		},
-	});
+// async function main(): Promise<void> {
+// 	const input = {
+// 		input1: [1, 2],
+// 		input2: [1, 3],
+// 	} as Prisma.JsonObject;
 
-	const problem2 = await prisma.problem.upsert({
-		where: { title: "What's new in Prisma? (Q1/22)" },
-		update: {},
-		create: {
-			title: 'Five sum',
-			description: 'Some dummy2 information,Some dummy2 information,Some dummy2 information.',
-			difficulty: 'Hard',
-			solution: 'This a solution2.',
-			constraints: ['a > b', 'a == 0'],
-		},
-	});
+// 	const output = {
+// 		output1: [3],
+// 		output2: [4],
+// 	} as Prisma.JsonObject;
 
-	console.log({ problem1, problem2 });
-}
+// 	const problem1 = await prisma.problem.upsert({
+// 		where: { title: 'Four sum' },
+// 		update: {},
+// 		create: {
+// 			title: 'Sum of two',
+// 			description: 'You need to add two given number a and b.',
+// 			difficulty: 'Easy',
+// 			solution: 'a + b.',
+// 			constraints: ['a > b', 'b == 0'],
+// 		},
+// 	});
 
-// execute the main function
-main()
-	.catch((e) => {
-		console.error(e);
-		process.exit(1);
-	})
-	.finally(async () => {
-		// close Prisma Client at the end
-		await prisma.$disconnect();
-	});
+// 	console.log({ problem1 });
+// }
+
+// // execute the main function
+// main()
+// 	.catch((e) => {
+// 		console.error(e);
+// 		process.exit(1);
+// 	})
+// 	.finally(async () => {
+// 		// close Prisma Client at the end
+// 		await prisma.$disconnect();
+// 	});

@@ -20,6 +20,8 @@ model Problem {
   difficulty  ProblemDifficulty @default(Medium)
   solution    String
   constraints String[]
+  inputs      Json
+  outputs     Json
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
 }

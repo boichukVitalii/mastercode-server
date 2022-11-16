@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Problem } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateProblemDto } from './dto/create-problem.dto';
 import { UpdateProblemDto } from './dto/update-problem.dto';
@@ -7,26 +8,26 @@ import { UpdateProblemDto } from './dto/update-problem.dto';
 export class ProblemsService {
 	constructor(private readonly prisma: PrismaService) {}
 
-	create(dto: CreateProblemDto) {
+	async create(dto: CreateProblemDto): Promise<Problem> {
 		return this.prisma.problem.create({ data: dto });
 	}
 
-	findAll() {
+	async findAll(): Promise<Problem[]> {
 		return this.prisma.problem.findMany();
 	}
 
-	findOne(id: number) {
+	async findOne(id: number): Promise<Problem> {
 		return this.prisma.problem.findUnique({ where: { id } });
 	}
 
-	update(id: number, dto: UpdateProblemDto) {
+	async update(id: number, dto: UpdateProblemDto): Promise<Problem> {
 		return this.prisma.problem.update({
 			where: { id },
 			data: dto,
 		});
 	}
 
-	remove(id: number) {
+	async remove(id: number): Promise<Problem> {
 		return this.prisma.problem.delete({ where: { id } });
 	}
 }

@@ -1,4 +1,4 @@
-import { IsArray, IsEnum, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsObject, IsString } from 'class-validator';
 import { ProblemDifficulty } from '../entities/problem.entity';
 
 export class CreateProblemDto {
@@ -17,4 +17,10 @@ export class CreateProblemDto {
 	@IsArray()
 	@IsString({ each: true })
 	constraints: string[];
+
+	@IsObject()
+	inputs: object;
+
+	@IsObject()
+	outputs: object;
 }

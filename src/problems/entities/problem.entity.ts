@@ -13,4 +13,6 @@ export class Problem {
 	constraints: string[];
 	createdAt: Date;
 	updatedAt: Date;
+	inputs: object;
+	outputs: object;
 }

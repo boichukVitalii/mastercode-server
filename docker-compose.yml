@@ -1,15 +1,36 @@
 services:
-
   postgres:
+    container_name: ms-postgres
     image: postgres:13.5
     restart: always
-    environment:
-      - POSTGRES_USER=myuser
-      - POSTGRES_PASSWORD=mypassword
+    env_file:
+      - docker.env
     volumes:
       - postgres:/var/lib/postgresql/data
     ports:
       - '5432:5432'
+    networks:
+      - postgres
+
+  pgadmin:
+    links:
+      - postgres:postgres
+    container_name: ms-pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      - /data/pgadmin:/root/.pgadmin
+    env_file:
+      - docker.env
+    networks:
+      - postgres
 
 volumes:
   postgres:
+
+
+networks:
+  postgres:
+    driver: bridge

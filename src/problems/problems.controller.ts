@@ -1,34 +1,47 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+	Controller,
+	Get,
+	Post,
+	Body,
+	Patch,
+	Param,
+	Delete,
+	NotFoundException,
+} from '@nestjs/common';
 import { ProblemsService } from './problems.service';
 import { CreateProblemDto } from './dto/create-problem.dto';
 import { UpdateProblemDto } from './dto/update-problem.dto';
+import { Problem } from '@prisma/client';
+import { PROBLEM_NOT_FOUND_ERROR } from './problems.constants';
 
 @Controller('problems')
 export class ProblemsController {
 	constructor(private readonly problemsService: ProblemsService) {}
 
 	@Post()
-	create(@Body() dto: CreateProblemDto) {
+	async create(@Body() dto: CreateProblemDto): Promise<Problem> {
 		return this.problemsService.create(dto);
 	}
 
 	@Get()
-	findAll() {
+	async findAll(): Promise<Problem[]> {
 		return this.problemsService.findAll();
 	}
 
 	@Get(':id')
-	findOne(@Param('id') id: number) {
-		return this.problemsService.findOne(id);
+	async findOne(@Param('id') id: number): Promise<Problem> {
+		const problem = await this.problemsService.findOne(id);
+		if (!problem) throw new NotFoundException(PROBLEM_NOT_FOUND_ERROR);
+		return problem;
 	}
 
 	@Patch(':id')
-	update(@Param('id') id: string, @Body() dto: UpdateProblemDto) {
-		return this.problemsService.update(+id, dto);
+	async update(@Param('id') id: number, @Body() dto: UpdateProblemDto): Promise<Problem> {
+		return this.problemsService.update(id, dto);
 	}
 
 	@Delete(':id')
-	remove(@Param('id') id: number) {
+	async remove(@Param('id') id: number): Promise<Problem> {
 		return this.problemsService.remove(id);
 	}
 }
