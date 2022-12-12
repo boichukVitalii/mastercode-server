@@ -5,6 +5,7 @@ export enum Verdict {
 }
 
 export class ResponseCompilerDto {
-	verdict?: Verdict;
-	logs?: string;
+	verdict: Verdict;
+	logs: string;
+	runTime: string | null;
 }

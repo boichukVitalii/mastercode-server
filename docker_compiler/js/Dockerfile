@@ -1,4 +1,4 @@
 FROM node:18-alpine 
 WORKDIR /opt/app 
 COPY . . 
-CMD [ "node", "./app.js" ]
+CMD [ "node", "./executor.js" ]

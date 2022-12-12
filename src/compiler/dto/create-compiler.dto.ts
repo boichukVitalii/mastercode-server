@@ -1,22 +1,26 @@
-import { IsBoolean, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsNumber, IsObject, IsOptional } from 'class-validator';
 
 export enum Language {
 	Js = 'js',
 	Python = 'py',
 }
 
+type CodeType = {
+	type: 'Buffer';
+	data: Array<number>;
+};
+
 export class CreateCompilerDto {
 	@IsEnum(Language)
 	lang: Language;
 
-	@IsString()
-	code: string;
+	@IsObject()
+	code: CodeType;
 
 	@IsOptional()
 	@IsBoolean()
 	submit?: boolean;
 
-	@IsOptional()
 	@IsNumber()
-	problemId?: number;
+	problemId: number;
 }
