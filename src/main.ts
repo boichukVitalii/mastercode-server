@@ -1,13 +1,18 @@
 import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-
-const PORT = 5000;
+import { GlobalExceptionFilter } from './blocks/filters/global-exceptions.filter';
+import { RestLoggingInterceptor } from './blocks/interceptors/rest-logging.interceptor';
+import config from './config';
+import { LoggerService } from './logger';
 
 async function bootstrap(): Promise<void> {
-	const app = await NestFactory.create(AppModule);
+	const app = await NestFactory.create(AppModule, {
+		logger: new LoggerService(),
+	});
 	app.setGlobalPrefix('api');
 	app.enableCors();
+	app.useGlobalInterceptors(new RestLoggingInterceptor());
 	app.useGlobalPipes(
 		new ValidationPipe({
 			whitelist: true,
@@ -16,6 +21,11 @@ async function bootstrap(): Promise<void> {
 			stopAtFirstError: true,
 		}),
 	);
-	await app.listen(PORT);
+
+	const httpAdapter = app.get(HttpAdapterHost);
+	app.useGlobalFilters(new GlobalExceptionFilter(httpAdapter));
+
+	app.enableShutdownHooks();
+	await app.listen(config.http.port);
 }
 bootstrap();

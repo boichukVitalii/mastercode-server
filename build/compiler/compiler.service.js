@@ -1,0 +1,33 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CompilerService = void 0;
+const common_1 = require("@nestjs/common");
+const problem_service_1 = require("../problem/problem.service");
+const compiler_class_1 = require("./compiler.class");
+let CompilerService = class CompilerService {
+    constructor(problemService) {
+        this.problemService = problemService;
+    }
+    async compile({ code, lang, problemId }) {
+        const problem = await this.problemService.findOne(problemId);
+        if (!problem)
+            throw new Error('Problem not found');
+        const compiler = new compiler_class_1.Compiler(code, lang, problem);
+        return compiler.compile();
+    }
+};
+CompilerService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [problem_service_1.ProblemService])
+], CompilerService);
+exports.CompilerService = CompilerService;
+//# sourceMappingURL=compiler.service.js.map

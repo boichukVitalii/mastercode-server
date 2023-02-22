@@ -1,8 +1,7 @@
-import { Controller, Post, Body, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, InternalServerErrorException } from '@nestjs/common';
 import { CompilerService } from './compiler.service';
 import { CreateCompilerDto } from './dto/create-compiler.dto';
 import { ResponseCompilerDto } from './dto/response-compiler.dto';
-import { COMPILER_ERROR } from './problems.constants';
 
 @Controller('compiler')
 export class CompilerController {
@@ -15,7 +14,7 @@ export class CompilerController {
 			return response;
 		} catch (e) {
 			console.error(e);
-			throw new HttpException(COMPILER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+			throw new InternalServerErrorException();
 		}
 	}
 }
