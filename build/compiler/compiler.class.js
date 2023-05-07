@@ -1,18 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Compiler = void 0;
+const response_compiler_dto_1 = require("./dto/response-compiler.dto");
 const node_crypto_1 = require("node:crypto");
 const node_fs_1 = require("node:fs");
 const node_path_1 = require("node:path");
 const node_child_process_1 = require("node:child_process");
-const response_compiler_dto_1 = require("./dto/response-compiler.dto");
 class Compiler {
     constructor(code, lang, problem) {
-        this.result = {
-            logs: '',
-            verdict: response_compiler_dto_1.Verdict.Error,
-            runTime: undefined,
-        };
+        this.result = { verdict: response_compiler_dto_1.Verdict.Error };
         this.code = code;
         this.lang = lang;
         this.problem = problem;
@@ -34,14 +30,12 @@ class Compiler {
     compile() {
         this.prepareEnv();
         return new Promise((resolve, reject) => {
-            const dockerBuild = (0, node_child_process_1.spawn)('docker', ['build', this.dockerCompilerDir, '-t', this.imageName]);
             const data = [];
             const errData = [];
+            const dockerBuild = (0, node_child_process_1.spawn)('docker', ['build', this.dockerCompilerDir, '-t', this.imageName]);
             dockerBuild.stdout.on('end', () => {
                 const dockerRun = (0, node_child_process_1.spawn)('docker', ['run', '--name', this.containerName, this.imageName]);
-                dockerRun.stdout.on('data', (chunk) => {
-                    data.push(chunk);
-                });
+                dockerRun.stdout.on('data', (chunk) => data.push(chunk));
                 dockerRun.stdout.on('end', () => {
                     if (errData.length) {
                         this.result.runTime = undefined;

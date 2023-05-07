@@ -21,11 +21,14 @@ export class Comment {
 	@Column('int', { default: 0 })
 	thumbs_up: number;
 
-	@ManyToOne(() => User, (user: User) => user.comments)
+	@Column('int', { default: 0 })
+	thumbs_down: number;
+
+	@ManyToOne(() => User, (user: User) => user.comments, { onDelete: 'CASCADE' })
 	@JoinColumn({ name: 'user_id' })
 	user: User;
 
-	@ManyToOne(() => Problem, (problem) => problem.comments)
+	@ManyToOne(() => Problem, (problem) => problem.comments, { onDelete: 'CASCADE' })
 	@JoinColumn({ name: 'problem_id' })
 	problem: Problem;
 

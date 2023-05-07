@@ -1,6 +1,5 @@
 import { Comment } from 'src/comment/entities/comment.entity';
 import { Category } from 'src/category/entities/category.entity';
-
 import {
 	Column,
 	CreateDateColumn,
@@ -13,6 +12,8 @@ import {
 	UpdateDateColumn,
 } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
+import { ProblemReaction } from './problem-reaction.entity';
+import { UserSolvedProblem } from 'src/user/entities/user-solved-problem.entity';
 
 export const ProblemDifficulty = {
 	EASY: 'easy',
@@ -20,7 +21,7 @@ export const ProblemDifficulty = {
 	HARD: 'hard',
 } as const;
 
-export type ProblemDifficultyType = typeof ProblemDifficulty[keyof typeof ProblemDifficulty];
+export type TProblemDifficulty = typeof ProblemDifficulty[keyof typeof ProblemDifficulty];
 
 @Entity('problem')
 export class Problem {
@@ -34,7 +35,7 @@ export class Problem {
 	description: string;
 
 	@Column('enum', { enum: ProblemDifficulty })
-	difficulty: ProblemDifficultyType;
+	difficulty: TProblemDifficulty;
 
 	@Column('text')
 	solution: string;
@@ -49,20 +50,26 @@ export class Problem {
 	constraints: string[];
 
 	@Column('json')
-	inputs: JSON;
+	inputs: Record<string, any[]>;
 
 	@Column('json')
-	outputs: JSON;
+	outputs: Record<string, any[]>;
 
-	@ManyToOne(() => Category, (category: Category) => category.problems)
+	@ManyToOne(() => Category, (category) => category.problems)
 	@JoinColumn({ name: 'category_id' })
 	category: Category;
 
-	@OneToMany(() => Comment, (comment: Comment) => comment.problem)
+	@OneToMany(() => Comment, (comment) => comment.problem)
 	comments: Comment[];
 
 	@ManyToMany(() => User)
 	users: User[];
+
+	@OneToMany(() => ProblemReaction, (problemReaction) => problemReaction.problem)
+	problems_reactions: ProblemReaction[];
+
+	@OneToMany(() => UserSolvedProblem, (solvedProblem) => solvedProblem.problem)
+	solved_problems: UserSolvedProblem[];
 
 	@CreateDateColumn()
 	created_at: Date;

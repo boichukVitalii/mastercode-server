@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { Category } from './entities/category.entity';
+import { EntityNotFoundCustomError } from 'src/errors/custom-errors';
+import { CATEGORY_NOT_FOUND_ERROR } from './category.constants';
 
 @Injectable()
 export class CategoryService {
@@ -11,28 +11,35 @@ export class CategoryService {
 		@InjectRepository(Category) private readonly categoryRepository: Repository<Category>,
 	) {}
 
-	async create(dto: CreateCategoryDto): Promise<Category> {
-		const category = this.categoryRepository.create(dto);
+	async create(data: DeepPartial<Category>): Promise<Category> {
+		const category = this.categoryRepository.create(data);
 		return this.categoryRepository.save(category);
 	}
 
-	async findAll(): Promise<Category[]> {
-		return this.categoryRepository.find();
+	async findMany(options: FindManyOptions<Category>): Promise<Category[]> {
+		return this.categoryRepository.find(options);
 	}
 
-	async findOne(id: string): Promise<Category | null> {
-		return this.categoryRepository.findOneBy({ id });
+	async findOne(where: FindOptionsWhere<Category>): Promise<Category | null> {
+		return this.categoryRepository.findOneBy(where);
 	}
 
-	async update(id: string, dto: UpdateCategoryDto): Promise<Category | null> {
-		const category = await this.findOne(id);
-		if (!category) return null;
-		return this.categoryRepository.save({ ...category, ...dto });
+	async findOneOrThrow(where: FindOptionsWhere<Category>): Promise<Category> {
+		const category = await this.categoryRepository.findOneBy(where);
+		if (!category) throw new EntityNotFoundCustomError(CATEGORY_NOT_FOUND_ERROR);
+		return category;
 	}
 
-	async remove(id: string): Promise<Category | null> {
-		const category = await this.findOne(id);
-		if (!category) return null;
+	async updateOne(
+		where: FindOptionsWhere<Category>,
+		data: DeepPartial<Category>,
+	): Promise<Category> {
+		const category = await this.findOneOrThrow(where);
+		return this.categoryRepository.save({ ...category, ...data });
+	}
+
+	async remove(where: FindOptionsWhere<Category>): Promise<Category> {
+		const category = await this.findOneOrThrow(where);
 		return this.categoryRepository.remove(category);
 	}
 }

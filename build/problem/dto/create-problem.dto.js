@@ -10,9 +10,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateProblemDto = void 0;
+const openapi = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 const problem_entity_1 = require("../entities/problem.entity");
 class CreateProblemDto {
+    static _OPENAPI_METADATA_FACTORY() {
+        return { title: { required: true, type: () => String }, description: { required: true, type: () => String }, difficulty: { required: true, type: () => Object }, solution: { required: true, type: () => String }, constraints: { required: true, type: () => [String] }, category_id: { required: true, type: () => Number }, inputs: { required: true, type: () => Object }, outputs: { required: true, type: () => Object } };
+    }
 }
 __decorate([
     (0, class_validator_1.IsString)(),

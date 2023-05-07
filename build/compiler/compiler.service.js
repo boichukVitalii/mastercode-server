@@ -18,9 +18,7 @@ let CompilerService = class CompilerService {
         this.problemService = problemService;
     }
     async compile({ code, lang, problemId }) {
-        const problem = await this.problemService.findOne(problemId);
-        if (!problem)
-            throw new Error('Problem not found');
+        const problem = await this.problemService.findOneOrThrow({ id: problemId });
         const compiler = new compiler_class_1.Compiler(code, lang, problem);
         return compiler.compile();
     }

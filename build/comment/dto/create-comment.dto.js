@@ -10,13 +10,21 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateCommentDto = void 0;
+const openapi = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class CreateCommentDto {
+    static _OPENAPI_METADATA_FACTORY() {
+        return { text: { required: true, type: () => String }, problemId: { required: true, type: () => String } };
+    }
 }
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], CreateCommentDto.prototype, "text", void 0);
+__decorate([
+    (0, class_validator_1.IsUUID)(),
+    __metadata("design:type", String)
+], CreateCommentDto.prototype, "problemId", void 0);
 exports.CreateCommentDto = CreateCommentDto;
 //# sourceMappingURL=create-comment.dto.js.map

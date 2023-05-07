@@ -1,7 +1,7 @@
 const fs = require('fs');
 const perf_hooks = require('perf_hooks');
 
-const solver = perf_hooks.performance.timerify(require('./app.js'));
+const solver = perf_hooks.performance.timerify(require('./solution.js'));
 
 const performanceObserver = new perf_hooks.PerformanceObserver((items, observer) => {
 	const entry = items.getEntriesByType('function').pop();
@@ -20,7 +20,6 @@ const validate = () => {
 	let count = 0;
 	const inval = Object.values(inputs);
 	const outval = Object.values(outputs);
-
 	for (let i = 0; i < inval.length; i++) {
 		const result = solver(inval[i]);
 		if (result?.toString() === outval[i].toString()) count++;
@@ -29,7 +28,6 @@ const validate = () => {
 			return;
 		}
 	}
-
 	if (count === inval.length) process.stdout.write('Accepted\n');
 	return;
 };

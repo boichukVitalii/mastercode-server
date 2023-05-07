@@ -1,11 +1,11 @@
-import { ProblemDifficultyType } from '../entities/problem.entity';
+import { TProblemDifficulty } from '../entities/problem.entity';
 export declare class CreateProblemDto {
     title: string;
     description: string;
-    difficulty: ProblemDifficultyType;
+    difficulty: TProblemDifficulty;
     solution: string;
     constraints: string[];
     category_id: number;
-    inputs: JSON;
-    outputs: JSON;
+    inputs: Record<string, any[]>;
+    outputs: Record<string, any[]>;
 }

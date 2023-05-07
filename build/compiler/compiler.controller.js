@@ -13,32 +13,34 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CompilerController = void 0;
+const openapi = require("@nestjs/swagger");
 const common_1 = require("@nestjs/common");
 const compiler_service_1 = require("./compiler.service");
-const create_compiler_dto_1 = require("./dto/create-compiler.dto");
+const compiler_dto_1 = require("./dto/compiler.dto");
+const swagger_1 = require("@nestjs/swagger");
 let CompilerController = class CompilerController {
     constructor(compilerService) {
         this.compilerService = compilerService;
     }
     async compile(dto) {
         try {
-            const response = await this.compilerService.compile(dto);
-            return response;
+            return this.compilerService.compile(dto);
         }
         catch (e) {
-            console.error(e);
             throw new common_1.InternalServerErrorException();
         }
     }
 };
 __decorate([
     (0, common_1.Post)(),
+    openapi.ApiResponse({ status: 201, type: require("./dto/response-compiler.dto").ResponseCompilerDto }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_compiler_dto_1.CreateCompilerDto]),
+    __metadata("design:paramtypes", [compiler_dto_1.CompilerDto]),
     __metadata("design:returntype", Promise)
 ], CompilerController.prototype, "compile", null);
 CompilerController = __decorate([
+    (0, swagger_1.ApiTags)('compiler'),
     (0, common_1.Controller)('compiler'),
     __metadata("design:paramtypes", [compiler_service_1.CompilerService])
 ], CompilerController);

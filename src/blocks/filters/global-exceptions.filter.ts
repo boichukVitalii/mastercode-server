@@ -6,23 +6,28 @@ import {
 	HttpException,
 	HttpStatus,
 } from '@nestjs/common';
+import {
+	EmailNotConfirmedError,
+	EntityNotFoundCustomError,
+	InvalidTokenError,
+	ServerConflictError,
+	WrongCredentialsError,
+} from 'src/errors/custom-errors';
+import logger from 'src/logger';
 import { EntityNotFoundError, QueryFailedError } from 'typeorm';
+import { NO_ADD_INFO_ABOUT_ERROR_MSG, NO_INFO_ABOUT_ERROR_MSG } from './filter.constants';
 
-const NO_INFO_ABOUT_ERROR_MSG = 'No info about the error';
-const NO_ADD_INFO_ABOUT_ERROR_MSG = 'No additional info about the error';
-
-// interface IDBErorr extends TypeORMError {
-// 	code: string;
-// 	detail: string;
-// }
-
-const TypeOrmExceptionsStatusCodes = new Map<string, number>([
+const ErrorsStatusCodes = new Map<string, number>([
 	[QueryFailedError.name, HttpStatus.UNPROCESSABLE_ENTITY],
-	[EntityNotFoundError.name, HttpStatus.UNPROCESSABLE_ENTITY],
+	[EntityNotFoundError.name, HttpStatus.NOT_FOUND],
+	[EntityNotFoundCustomError.name, HttpStatus.NOT_FOUND],
+	[WrongCredentialsError.name, HttpStatus.UNAUTHORIZED],
+	[ServerConflictError.name, HttpStatus.CONFLICT],
+	[EmailNotConfirmedError.name, HttpStatus.UNAUTHORIZED],
+	[InvalidTokenError.name, HttpStatus.BAD_REQUEST],
 ]);
 
-const getExceptionStatusCode = (name: string): number | undefined =>
-	TypeOrmExceptionsStatusCodes.get(name);
+const getErrorStatusCode = (name: string): number | undefined => ErrorsStatusCodes.get(name);
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -36,12 +41,12 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 			exception instanceof HttpException
 				? exception.getStatus()
 				: exception instanceof Error
-				? getExceptionStatusCode(exception.constructor.name) || HttpStatus.INTERNAL_SERVER_ERROR
+				? getErrorStatusCode(exception.constructor.name) || HttpStatus.INTERNAL_SERVER_ERROR
 				: HttpStatus.INTERNAL_SERVER_ERROR;
 
 		const message =
 			exception instanceof Error
-				? exception.message.split('"')[0] || NO_INFO_ABOUT_ERROR_MSG
+				? exception.message || NO_INFO_ABOUT_ERROR_MSG
 				: NO_INFO_ABOUT_ERROR_MSG;
 
 		const additionalInfo =
@@ -50,6 +55,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 				: exception instanceof QueryFailedError
 				? exception.driverError.detail || NO_ADD_INFO_ABOUT_ERROR_MSG
 				: NO_ADD_INFO_ABOUT_ERROR_MSG;
+
+		logger.error(exception);
 
 		const request = ctx.getRequest();
 		const responseBody = {

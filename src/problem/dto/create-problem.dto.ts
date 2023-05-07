@@ -1,5 +1,5 @@
 import { IsArray, IsEnum, IsObject, IsString } from 'class-validator';
-import { ProblemDifficulty, ProblemDifficultyType } from '../entities/problem.entity';
+import { ProblemDifficulty, TProblemDifficulty } from '../entities/problem.entity';
 
 export class CreateProblemDto {
 	@IsString()
@@ -9,7 +9,7 @@ export class CreateProblemDto {
 	description: string;
 
 	@IsEnum(ProblemDifficulty)
-	difficulty: ProblemDifficultyType;
+	difficulty: TProblemDifficulty;
 
 	@IsString()
 	solution: string;
@@ -22,8 +22,8 @@ export class CreateProblemDto {
 	category_id: number;
 
 	@IsObject()
-	inputs: JSON;
+	inputs: Record<string, any[]>;
 
-	@IsObject() //isJson
-	outputs: JSON;
+	@IsObject()
+	outputs: Record<string, any[]>;
 }

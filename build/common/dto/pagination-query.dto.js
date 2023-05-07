@@ -10,21 +10,25 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PaginationQueryDto = void 0;
+const openapi = require("@nestjs/swagger");
 const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
 class PaginationQueryDto {
+    static _OPENAPI_METADATA_FACTORY() {
+        return { skip: { required: false, type: () => Number, minimum: 1 }, take: { required: false, type: () => Number, minimum: 1 } };
+    }
 }
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsPositive)(),
     (0, class_transformer_1.Type)(() => Number),
     __metadata("design:type", Number)
-], PaginationQueryDto.prototype, "limit", void 0);
+], PaginationQueryDto.prototype, "skip", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsPositive)(),
     (0, class_transformer_1.Type)(() => Number),
     __metadata("design:type", Number)
-], PaginationQueryDto.prototype, "offset", void 0);
+], PaginationQueryDto.prototype, "take", void 0);
 exports.PaginationQueryDto = PaginationQueryDto;
 //# sourceMappingURL=pagination-query.dto.js.map

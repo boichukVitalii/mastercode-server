@@ -17,34 +17,34 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const comment_entity_1 = require("./entities/comment.entity");
+const custom_errors_1 = require("../errors/custom-errors");
+const comment_constants_1 = require("./comment.constants");
 let CommentService = class CommentService {
     constructor(commentRepository) {
         this.commentRepository = commentRepository;
     }
-    async create(dto) {
-        const comment = this.commentRepository.create(dto);
+    async create(data, user, problem) {
+        const comment = this.commentRepository.create({ ...data, user, problem });
         return this.commentRepository.save(comment);
     }
-    async findAll(paginationQuery) {
-        const { limit, offset } = paginationQuery;
-        return this.commentRepository.find({
-            skip: offset,
-            take: limit,
-        });
+    async findMany(options) {
+        return this.commentRepository.find(options);
     }
-    async findOne(id) {
-        return this.commentRepository.findOneBy({ id });
+    async findOne(where) {
+        return this.commentRepository.findOneBy(where);
     }
-    async update(id, dto) {
-        const comment = await this.findOne(id);
+    async findOneOrThrow(where) {
+        const comment = await this.commentRepository.findOneBy(where);
         if (!comment)
-            return null;
-        return this.commentRepository.save({ ...comment, ...dto });
+            throw new custom_errors_1.EntityNotFoundCustomError(comment_constants_1.COMMENT_NOT_FOUND_ERROR);
+        return comment;
     }
-    async remove(id) {
-        const comment = await this.findOne(id);
-        if (!comment)
-            return null;
+    async updateOne(where, data) {
+        const comment = await this.findOneOrThrow(where);
+        return this.commentRepository.save({ ...comment, ...data });
+    }
+    async remove(where) {
+        const comment = await this.findOneOrThrow(where);
         return this.commentRepository.remove(comment);
     }
 };

@@ -13,12 +13,20 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProblemController = void 0;
+const openapi = require("@nestjs/swagger");
 const common_1 = require("@nestjs/common");
 const problem_service_1 = require("./problem.service");
 const create_problem_dto_1 = require("./dto/create-problem.dto");
 const update_problem_dto_1 = require("./dto/update-problem.dto");
 const problem_constants_1 = require("./problem.constants");
+const problem_entity_1 = require("./entities/problem.entity");
 const pagination_query_dto_1 = require("../common/dto/pagination-query.dto");
+const policy_handler_1 = require("../blocks/handlers/policy.handler");
+const check_policies_decorator_1 = require("../blocks/decorators/check-policies.decorator");
+const casl_types_type_1 = require("../casl/types/casl-types.type");
+const swagger_1 = require("@nestjs/swagger");
+const get_current_userId_decorator_1 = require("../blocks/decorators/get-current-userId.decorator");
+const toggle_reaction_dto_1 = require("./dto/toggle-reaction.dto");
 let ProblemController = class ProblemController {
     constructor(problemService) {
         this.problemService = problemService;
@@ -26,44 +34,51 @@ let ProblemController = class ProblemController {
     async create(dto) {
         return this.problemService.create(dto);
     }
-    async findAll(paginationQuery) {
-        return this.problemService.findAll(paginationQuery);
+    async findMany(query) {
+        const problems = await this.problemService.findMany(query);
+        if (!problems.length)
+            throw new common_1.NotFoundException(problem_constants_1.PROBLEMS_NOT_FOUND_ERROR);
+        return problems;
     }
     async findOne(id) {
-        const problem = await this.problemService.findOne(id);
-        if (!problem)
-            throw new common_1.NotFoundException(problem_constants_1.PROBLEM_NOT_FOUND_ERROR);
+        const problem = await this.problemService.findOneOrThrow({ id });
         return problem;
     }
     async update(id, dto) {
-        const problem = await this.problemService.update(id, dto);
-        if (!problem)
-            throw new common_1.NotFoundException(problem_constants_1.PROBLEM_NOT_FOUND_ERROR);
+        const problem = await this.problemService.updateOne({ id }, dto);
         return problem;
     }
     async remove(id) {
-        const problem = await this.problemService.remove(id);
-        if (!problem)
-            throw new common_1.NotFoundException(problem_constants_1.PROBLEM_NOT_FOUND_ERROR);
-        return problem;
+        await this.problemService.remove({ id });
+    }
+    async toggleReaction({ problem_id, reaction_type }, userId) {
+        return this.problemService.toggleReaction(problem_id, userId, reaction_type);
     }
 };
 __decorate([
     (0, common_1.Post)(),
+    (0, check_policies_decorator_1.CheckPolicies)(new policy_handler_1.PolicyHandler(casl_types_type_1.Action.Create, problem_entity_1.Problem)),
+    openapi.ApiResponse({ status: 201, type: require("./entities/problem.entity").Problem }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_problem_dto_1.CreateProblemDto]),
     __metadata("design:returntype", Promise)
 ], ProblemController.prototype, "create", null);
 __decorate([
+    (0, common_1.UseInterceptors)(common_1.CacheInterceptor),
+    (0, common_1.CacheTTL)(1000 * 60),
     (0, common_1.Get)(),
+    (0, check_policies_decorator_1.CheckPolicies)(new policy_handler_1.PolicyHandler(casl_types_type_1.Action.ReadMany, problem_entity_1.Problem)),
+    openapi.ApiResponse({ status: 200, type: [require("./entities/problem.entity").Problem] }),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [pagination_query_dto_1.PaginationQueryDto]),
     __metadata("design:returntype", Promise)
-], ProblemController.prototype, "findAll", null);
+], ProblemController.prototype, "findMany", null);
 __decorate([
     (0, common_1.Get)(':id'),
+    (0, check_policies_decorator_1.CheckPolicies)(new policy_handler_1.PolicyHandler(casl_types_type_1.Action.ReadOne, problem_entity_1.Problem)),
+    openapi.ApiResponse({ status: 200, type: require("./entities/problem.entity").Problem }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -71,6 +86,8 @@ __decorate([
 ], ProblemController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)(':id'),
+    (0, check_policies_decorator_1.CheckPolicies)(new policy_handler_1.PolicyHandler(casl_types_type_1.Action.Update, problem_entity_1.Problem)),
+    openapi.ApiResponse({ status: 200, type: require("./entities/problem.entity").Problem }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -79,13 +96,26 @@ __decorate([
 ], ProblemController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
+    (0, check_policies_decorator_1.CheckPolicies)(new policy_handler_1.PolicyHandler(casl_types_type_1.Action.Delete, problem_entity_1.Problem)),
+    openapi.ApiResponse({ status: common_1.HttpStatus.NO_CONTENT }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], ProblemController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Post)('toggle-reaction'),
+    openapi.ApiResponse({ status: 201, type: require("./dto/toggle-reaction-response.dto").ToggleReactionResponseDto }),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, get_current_userId_decorator_1.GetCurrentUserId)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [toggle_reaction_dto_1.ToggleReactionDto, String]),
+    __metadata("design:returntype", Promise)
+], ProblemController.prototype, "toggleReaction", null);
 ProblemController = __decorate([
-    (0, common_1.Controller)('problems'),
+    (0, swagger_1.ApiTags)('problem'),
+    (0, common_1.Controller)('problem'),
     __metadata("design:paramtypes", [problem_service_1.ProblemService])
 ], ProblemController);
 exports.ProblemController = ProblemController;

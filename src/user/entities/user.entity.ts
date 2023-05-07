@@ -1,22 +1,25 @@
+import { PasswordResetToken } from 'src/auth/entities/password-reset-token.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
-import { Problem } from 'src/problem/entities/problem.entity';
+import { File } from 'src/file/entities/file.entity';
+import { ProblemReaction } from 'src/problem/entities/problem-reaction.entity';
 import {
 	Column,
 	CreateDateColumn,
 	Entity,
-	JoinTable,
-	ManyToMany,
+	JoinColumn,
 	OneToMany,
+	OneToOne,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm';
+import { UserSolvedProblem } from './user-solved-problem.entity';
 
 export const UserRole = {
 	USER: 'user',
 	ADMIN: 'admin',
 } as const;
 
-export type UserRoleType = typeof UserRole[keyof typeof UserRole];
+export type TUserRole = typeof UserRole[keyof typeof UserRole];
 
 @Entity('user')
 export class User {
@@ -32,34 +35,39 @@ export class User {
 	@Column('varchar', { length: 254, unique: true })
 	email: string;
 
-	@Column('varchar', { length: 254 })
-	password_hash: string;
-
 	@Column('varchar', { length: 254, nullable: true })
-	avatar: string;
+	password_hash?: string | null;
+
+	@JoinColumn({ name: 'avatar_id' })
+	@OneToOne(() => File, { nullable: true, onDelete: 'SET NULL' })
+	avatar?: File | null;
+
+	@Column('uuid', { nullable: true })
+	avatar_id?: string | null;
 
 	@Column('text', { nullable: true })
-	additional_info: string;
+	additional_info?: string | null;
 
 	@Column('enum', { enum: UserRole, array: true, default: [UserRole.USER] })
-	roles: UserRoleType[];
+	roles: TUserRole[];
 
-	@OneToMany(() => Comment, (comment: Comment) => comment.user)
+	@OneToMany(() => Comment, (comment) => comment.user)
 	comments: Comment[];
 
-	@ManyToMany(() => Problem)
-	@JoinTable({
-		name: 'user_problem_history',
-		joinColumn: {
-			name: 'user',
-			referencedColumnName: 'id',
-		},
-		inverseJoinColumn: {
-			name: 'problem',
-			referencedColumnName: 'id',
-		},
-	})
-	problems_history: Problem[];
+	@Column({ default: false })
+	is_email_confirmed: boolean;
+
+	@OneToMany(() => PasswordResetToken, (token) => token.user)
+	password_reset_tokens: PasswordResetToken[];
+
+	@Column('varchar', { length: 254, nullable: true, unique: true })
+	google_id?: string | null;
+
+	@OneToMany(() => ProblemReaction, (problemReaction) => problemReaction.user)
+	problems_reactions: ProblemReaction[];
+
+	@OneToMany(() => UserSolvedProblem, (solvedProblem) => solvedProblem.user)
+	solved_problems: UserSolvedProblem[];
 
 	@CreateDateColumn()
 	created_at: Date;
@@ -67,6 +75,6 @@ export class User {
 	@UpdateDateColumn()
 	updated_at: Date;
 
-	@Column('varchar', { length: 254 })
-	refresh_token_hash: string;
+	@Column('varchar', { length: 254, nullable: true })
+	refresh_token_hash?: string | null;
 }

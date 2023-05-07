@@ -1,10 +1,12 @@
-export declare enum Verdict {
-    Accepted = "Accepted",
-    WrongAnswer = "Wrong answer",
-    Error = "Error"
-}
+export declare const Verdict: {
+    readonly Accepted: "Accepted";
+    readonly Correct: "Correct";
+    readonly WrongAnswer: "Wrong answer";
+    readonly Error: "Error";
+};
+export declare type TVerdict = typeof Verdict[keyof typeof Verdict];
 export declare class ResponseCompilerDto {
-    verdict: Verdict;
-    logs: string;
-    runTime: string | undefined;
+    verdict: TVerdict;
+    logs?: string;
+    runTime?: string;
 }

@@ -1,41 +1,42 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
-import { Repository } from 'typeorm';
-import { CreateCommentDto } from './dto/create-comment.dto';
-import { UpdateCommentDto } from './dto/update-comment.dto';
+import { Problem } from 'src/problem/entities/problem.entity';
+import { User } from 'src/user/entities/user.entity';
+import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { Comment } from './entities/comment.entity';
+import { EntityNotFoundCustomError } from 'src/errors/custom-errors';
+import { COMMENT_NOT_FOUND_ERROR } from './comment.constants';
 
 @Injectable()
 export class CommentService {
 	constructor(@InjectRepository(Comment) private readonly commentRepository: Repository<Comment>) {}
 
-	async create(dto: CreateCommentDto): Promise<Comment> {
-		const comment = this.commentRepository.create(dto);
+	async create(data: DeepPartial<Comment>, user: User, problem: Problem): Promise<Comment> {
+		const comment = this.commentRepository.create({ ...data, user, problem });
 		return this.commentRepository.save(comment);
 	}
 
-	async findAll(paginationQuery: PaginationQueryDto): Promise<Comment[]> {
-		const { limit, offset } = paginationQuery;
-		return this.commentRepository.find({
-			skip: offset,
-			take: limit,
-		});
+	async findMany(options: FindManyOptions<Comment>): Promise<Comment[]> {
+		return this.commentRepository.find(options);
 	}
 
-	async findOne(id: string): Promise<Comment | null> {
-		return this.commentRepository.findOneBy({ id });
+	async findOne(where: FindOptionsWhere<Comment>): Promise<Comment | null> {
+		return this.commentRepository.findOneBy(where);
 	}
 
-	async update(id: string, dto: UpdateCommentDto): Promise<Comment | null> {
-		const comment = await this.findOne(id);
-		if (!comment) return null;
-		return this.commentRepository.save({ ...comment, ...dto });
+	async findOneOrThrow(where: FindOptionsWhere<Comment>): Promise<Comment> {
+		const comment = await this.commentRepository.findOneBy(where);
+		if (!comment) throw new EntityNotFoundCustomError(COMMENT_NOT_FOUND_ERROR);
+		return comment;
 	}
 
-	async remove(id: string): Promise<Comment | null> {
-		const comment = await this.findOne(id);
-		if (!comment) return null;
+	async updateOne(where: FindOptionsWhere<User>, data: DeepPartial<Comment>): Promise<Comment> {
+		const comment = await this.findOneOrThrow(where);
+		return this.commentRepository.save({ ...comment, ...data });
+	}
+
+	async remove(where: FindOptionsWhere<Comment>): Promise<Comment> {
+		const comment = await this.findOneOrThrow(where);
 		return this.commentRepository.remove(comment);
 	}
 }

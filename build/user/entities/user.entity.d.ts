@@ -1,22 +1,30 @@
+import { PasswordResetToken } from 'src/auth/entities/password-reset-token.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
-import { Problem } from 'src/problem/entities/problem.entity';
+import { File } from 'src/file/entities/file.entity';
+import { ProblemReaction } from 'src/problem/entities/problem-reaction.entity';
+import { UserSolvedProblem } from './user-solved-problem.entity';
 export declare const UserRole: {
     readonly USER: "user";
     readonly ADMIN: "admin";
 };
-export declare type UserRoleType = typeof UserRole[keyof typeof UserRole];
+export declare type TUserRole = typeof UserRole[keyof typeof UserRole];
 export declare class User {
     id: string;
     first_name: string;
     last_name: string;
     email: string;
-    password_hash: string;
-    avatar: string;
-    additional_info: string;
-    roles: UserRoleType[];
+    password_hash?: string | null;
+    avatar?: File | null;
+    avatar_id?: string | null;
+    additional_info?: string | null;
+    roles: TUserRole[];
     comments: Comment[];
-    problems_history: Problem[];
+    is_email_confirmed: boolean;
+    password_reset_tokens: PasswordResetToken[];
+    google_id?: string | null;
+    problems_reactions: ProblemReaction[];
+    solved_problems: UserSolvedProblem[];
     created_at: Date;
     updated_at: Date;
-    refresh_token_hash: string;
+    refresh_token_hash?: string | null;
 }

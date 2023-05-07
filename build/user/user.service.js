@@ -15,43 +15,115 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
+const custom_errors_1 = require("../errors/custom-errors");
+const file_service_1 = require("../file/file.service");
+const mfile_class_1 = require("../file/mfile.class");
 const typeorm_2 = require("typeorm");
 const user_entity_1 = require("./entities/user.entity");
+const user_constants_1 = require("./user.constants");
+const problem_service_1 = require("../problem/problem.service");
+const user_solved_problem_entity_1 = require("./entities/user-solved-problem.entity");
 let UserService = class UserService {
-    constructor(userRepository) {
+    constructor(userRepository, userSolvedProblemRepository, problemService, fileService, dataSource) {
         this.userRepository = userRepository;
+        this.userSolvedProblemRepository = userSolvedProblemRepository;
+        this.problemService = problemService;
+        this.fileService = fileService;
+        this.dataSource = dataSource;
     }
-    async create(dto) {
-        const user = this.userRepository.create(dto);
+    async create(data) {
+        const user = this.userRepository.create(data);
         return this.userRepository.save(user);
     }
-    async findAll(paginationQuery) {
-        const { limit, offset } = paginationQuery;
-        return this.userRepository.find({
-            skip: offset,
-            take: limit,
-        });
+    async findMany(options) {
+        const { skip, take, email } = options;
+        return this.userRepository.find({ skip, take, where: { email } });
     }
-    async findOne(id) {
-        return this.userRepository.findOneBy({ id });
+    async findOne(where) {
+        return this.userRepository.findOneBy(where);
     }
-    async update(id, dto) {
-        const user = await this.findOne(id);
+    async findOneOrThrow(where) {
+        const user = await this.userRepository.findOneBy(where);
         if (!user)
-            return null;
-        return this.userRepository.save({ ...user, ...dto });
+            throw new custom_errors_1.EntityNotFoundCustomError(user_constants_1.USER_NOT_FOUND_ERROR);
+        return user;
     }
-    async remove(id) {
-        const user = await this.findOne(id);
-        if (!user)
-            return null;
+    async updateOne(where, data) {
+        const user = await this.findOneOrThrow(where);
+        return this.userRepository.save({ ...user, ...data });
+    }
+    async updateMany(options, data) {
+        const users = await this.findMany(options);
+        if (!users.length)
+            return [];
+        return this.userRepository.save(users.map((user) => ({ ...user, ...data })));
+    }
+    async remove(where) {
+        const user = await this.findOneOrThrow(where);
         return this.userRepository.remove(user);
+    }
+    async uploadAvatar(file, userId) {
+        const bufferWebP = await this.fileService.convertToWebP(file.buffer);
+        const filename = `avatar-${userId}.webp`;
+        const mimetype = 'image/webp';
+        const mfile = new mfile_class_1.MFile(filename, mimetype, bufferWebP);
+        const folderToSave = 'avatars';
+        const avatar = (await this.fileService.saveFiles([mfile], folderToSave))[0];
+        const user = await this.findOneOrThrow({ id: userId });
+        if (user.avatar_id)
+            await this.removeAvatar(userId);
+        user.avatar_id = avatar.id;
+        await this.userRepository.save({ ...user });
+        return avatar;
+    }
+    async getUserAvatar(userId) {
+        const user = await this.findOneOrThrow({ id: userId });
+        if (!user.avatar_id)
+            return null;
+        return this.fileService.getFileById(user.avatar_id);
+    }
+    async removeAvatar(userId) {
+        const queryRunner = this.dataSource.createQueryRunner();
+        const user = await this.findOneOrThrow({ id: userId });
+        if (!user.avatar_id)
+            return;
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
+            await queryRunner.manager.update(user_entity_1.User, { id: userId }, { ...user, avatar_id: null });
+            await this.fileService.removeFileWithQueryRunner(user.avatar_id, queryRunner);
+            await queryRunner.commitTransaction();
+        }
+        catch (e) {
+            await queryRunner.rollbackTransaction();
+            throw e;
+        }
+        finally {
+            await queryRunner.release();
+        }
+    }
+    async addSolvedProblem(data) {
+        const solvedProblem = this.userSolvedProblemRepository.create({ ...data });
+        await this.userSolvedProblemRepository.save(solvedProblem);
+    }
+    async getSolvedProblems(userId) {
+        return this.userSolvedProblemRepository.find({
+            where: { user_id: userId },
+            relations: {
+                problem: true,
+            },
+        });
     }
 };
 UserService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __param(1, (0, typeorm_1.InjectRepository)(user_solved_problem_entity_1.UserSolvedProblem)),
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
+        problem_service_1.ProblemService,
+        file_service_1.FileService,
+        typeorm_2.DataSource])
 ], UserService);
 exports.UserService = UserService;
 //# sourceMappingURL=user.service.js.map

@@ -1,19 +1,19 @@
 import { Controller, Post, Body, InternalServerErrorException } from '@nestjs/common';
 import { CompilerService } from './compiler.service';
-import { CreateCompilerDto } from './dto/create-compiler.dto';
+import { CompilerDto } from './dto/compiler.dto';
 import { ResponseCompilerDto } from './dto/response-compiler.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('compiler')
 @Controller('compiler')
 export class CompilerController {
 	constructor(private readonly compilerService: CompilerService) {}
 
 	@Post()
-	async compile(@Body() dto: CreateCompilerDto): Promise<ResponseCompilerDto> {
+	async compile(@Body() dto: CompilerDto): Promise<ResponseCompilerDto> {
 		try {
-			const response = await this.compilerService.compile(dto);
-			return response;
+			return this.compilerService.compile(dto);
 		} catch (e) {
-			console.error(e);
 			throw new InternalServerErrorException();
 		}
 	}

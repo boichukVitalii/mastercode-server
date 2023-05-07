@@ -12,11 +12,12 @@ const problem_service_1 = require("./problem.service");
 const problem_controller_1 = require("./problem.controller");
 const typeorm_1 = require("@nestjs/typeorm");
 const problem_entity_1 = require("./entities/problem.entity");
+const problem_reaction_entity_1 = require("./entities/problem-reaction.entity");
 let ProblemModule = class ProblemModule {
 };
 ProblemModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([problem_entity_1.Problem])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([problem_entity_1.Problem, problem_reaction_entity_1.ProblemReaction])],
         controllers: [problem_controller_1.ProblemController],
         providers: [problem_service_1.ProblemService],
         exports: [problem_service_1.ProblemService],

@@ -10,9 +10,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Category = void 0;
+const openapi = require("@nestjs/swagger");
 const problem_entity_1 = require("../../problem/entities/problem.entity");
 const typeorm_1 = require("typeorm");
 let Category = class Category {
+    static _OPENAPI_METADATA_FACTORY() {
+        return { id: { required: true, type: () => String }, name: { required: true, type: () => String }, additional_info: { required: false, type: () => String, nullable: true }, problems: { required: true, type: () => [require("../../problem/entities/problem.entity").Problem] } };
+    }
 };
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
@@ -24,7 +28,7 @@ __decorate([
 ], Category.prototype, "name", void 0);
 __decorate([
     (0, typeorm_1.Column)('text', { nullable: true }),
-    __metadata("design:type", String)
+    __metadata("design:type", Object)
 ], Category.prototype, "additional_info", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => problem_entity_1.Problem, (problem) => problem.category),

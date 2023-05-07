@@ -13,68 +13,143 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
+const openapi = require("@nestjs/swagger");
 const common_1 = require("@nestjs/common");
+const get_current_user_decorator_1 = require("../blocks/decorators/get-current-user.decorator");
+const get_current_userId_decorator_1 = require("../blocks/decorators/get-current-userId.decorator");
+const public_decorator_1 = require("../blocks/decorators/public.decorator");
+const refresh_token_guard_1 = require("../blocks/guards/refresh-token.guard");
+const email_confirmation_service_1 = require("../email-confirmation/email-confirmation.service");
 const auth_service_1 = require("./auth.service");
-const create_auth_dto_1 = require("./dto/create-auth.dto");
-const update_auth_dto_1 = require("./dto/update-auth.dto");
+const auth_response_dto_1 = require("./dto/auth-response.dto");
+const signin_local_dto_1 = require("./dto/signin-local.dto");
+const signup_local_dto_1 = require("./dto/signup-local.dto");
+const reset_password_dto_1 = require("./dto/reset-password.dto");
+const new_password_dto_1 = require("./dto/new-password.dto");
+const swagger_1 = require("@nestjs/swagger");
+const auth_constants_1 = require("./auth.constants");
+const google_authentication_service_1 = require("./social/google-authentication.service");
+const google_token_dto_1 = require("./dto/google-token.dto");
 let AuthController = class AuthController {
-    constructor(authService) {
+    constructor(authService, emailConfirmationService, googleAuthService) {
         this.authService = authService;
+        this.emailConfirmationService = emailConfirmationService;
+        this.googleAuthService = googleAuthService;
     }
-    create(createAuthDto) {
-        return this.authService.create(createAuthDto);
+    async signupLocal(dto) {
+        if (dto.password !== dto.confirm_password) {
+            throw new common_1.BadRequestException(auth_constants_1.PASSWORDS_NOT_MATCH_ERROR);
+        }
+        const { user, tokens } = await this.authService.signupLocal(dto);
+        await this.emailConfirmationService.sendVerificationLink(dto.email);
+        return {
+            user: new auth_response_dto_1.AuthResponseDto(user),
+            tokens,
+        };
     }
-    findAll() {
-        return this.authService.findAll();
+    async signinLocal(dto) {
+        const { user, tokens } = await this.authService.signinLocal(dto);
+        return {
+            user: new auth_response_dto_1.AuthResponseDto(user),
+            tokens,
+        };
     }
-    findOne(id) {
-        return this.authService.findOne(+id);
+    async auth(dto) {
+        return this.googleAuthService.authenticate(dto.token);
     }
-    update(id, updateAuthDto) {
-        return this.authService.update(+id, updateAuthDto);
+    async logout(userId) {
+        await this.authService.logout(userId);
     }
-    remove(id) {
-        return this.authService.remove(+id);
+    async refreshTokens(userId, refreshToken) {
+        return this.authService.refreshTokens(userId, refreshToken);
+    }
+    async getPasswordResetToken({ email }) {
+        await this.authService.generatePasswordResetToken(email);
+    }
+    async resetPassword(dto) {
+        if (dto.password !== dto.confirm_password) {
+            throw new common_1.BadRequestException(auth_constants_1.PASSWORDS_NOT_MATCH_ERROR);
+        }
+        await this.authService.resetPassword(dto.token, dto.password);
     }
 };
 __decorate([
-    (0, common_1.Post)(),
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Post)('local/signup'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
+    openapi.ApiResponse({ status: common_1.HttpStatus.CREATED, type: Object }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_auth_dto_1.CreateAuthDto]),
-    __metadata("design:returntype", void 0)
-], AuthController.prototype, "create", null);
+    __metadata("design:paramtypes", [signup_local_dto_1.SignupLocalDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "signupLocal", null);
 __decorate([
-    (0, common_1.Get)(),
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Post)('local/signin'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    openapi.ApiResponse({ status: common_1.HttpStatus.OK, type: Object }),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], AuthController.prototype, "findAll", null);
+    __metadata("design:paramtypes", [signin_local_dto_1.SigninLocalDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "signinLocal", null);
 __decorate([
-    (0, common_1.Get)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Post)('social/google'),
+    openapi.ApiResponse({ status: 201, type: Object }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [google_token_dto_1.GoogleTokenDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "auth", null);
+__decorate([
+    (0, common_1.Post)('logout'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
+    openapi.ApiResponse({ status: common_1.HttpStatus.NO_CONTENT }),
+    __param(0, (0, get_current_userId_decorator_1.GetCurrentUserId)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], AuthController.prototype, "findOne", null);
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "logout", null);
 __decorate([
-    (0, common_1.Patch)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
+    (0, public_decorator_1.Public)(),
+    (0, common_1.UseGuards)(refresh_token_guard_1.RefreshTokenGuard),
+    (0, common_1.Post)('refresh'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    openapi.ApiResponse({ status: common_1.HttpStatus.OK, type: Object }),
+    __param(0, (0, get_current_userId_decorator_1.GetCurrentUserId)()),
+    __param(1, (0, get_current_user_decorator_1.GetCurrentUser)('refresh_token_hash')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, update_auth_dto_1.UpdateAuthDto]),
-    __metadata("design:returntype", void 0)
-], AuthController.prototype, "update", null);
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "refreshTokens", null);
 __decorate([
-    (0, common_1.Delete)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Post)('password-reset-token'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
+    openapi.ApiResponse({ status: common_1.HttpStatus.NO_CONTENT }),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], AuthController.prototype, "remove", null);
+    __metadata("design:paramtypes", [reset_password_dto_1.ResetPasswordDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "getPasswordResetToken", null);
+__decorate([
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Post)('reset-password'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
+    openapi.ApiResponse({ status: common_1.HttpStatus.NO_CONTENT }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [new_password_dto_1.NewPasswordDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "resetPassword", null);
 AuthController = __decorate([
+    (0, swagger_1.ApiTags)('auth'),
+    (0, common_1.UseInterceptors)(common_1.ClassSerializerInterceptor),
     (0, common_1.Controller)('auth'),
-    __metadata("design:paramtypes", [auth_service_1.AuthService])
+    __metadata("design:paramtypes", [auth_service_1.AuthService,
+        email_confirmation_service_1.EmailConfirmationService,
+        google_authentication_service_1.GoogleAuthService])
 ], AuthController);
 exports.AuthController = AuthController;
 //# sourceMappingURL=auth.controller.js.map

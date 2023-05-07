@@ -13,11 +13,18 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CategoryController = void 0;
+const openapi = require("@nestjs/swagger");
 const common_1 = require("@nestjs/common");
+const check_policies_decorator_1 = require("../blocks/decorators/check-policies.decorator");
+const policy_handler_1 = require("../blocks/handlers/policy.handler");
+const casl_types_type_1 = require("../casl/types/casl-types.type");
+const pagination_query_dto_1 = require("../common/dto/pagination-query.dto");
 const category_constants_1 = require("./category.constants");
 const category_service_1 = require("./category.service");
 const create_category_dto_1 = require("./dto/create-category.dto");
 const update_category_dto_1 = require("./dto/update-category.dto");
+const category_entity_1 = require("./entities/category.entity");
+const swagger_1 = require("@nestjs/swagger");
 let CategoryController = class CategoryController {
     constructor(categoryService) {
         this.categoryService = categoryService;
@@ -25,30 +32,29 @@ let CategoryController = class CategoryController {
     async create(dto) {
         return this.categoryService.create(dto);
     }
-    async findAll() {
-        return this.categoryService.findAll();
+    async findMany(query) {
+        const categories = await this.categoryService.findMany(query);
+        if (!categories.length)
+            throw new common_1.NotFoundException(category_constants_1.CATEGORIES_NOT_FOUND_ERROR);
+        return categories;
     }
     async findOne(id) {
-        const category = await this.categoryService.findOne(id);
-        if (!category)
-            throw new common_1.NotFoundException(category_constants_1.CATEGORY_NOT_FOUND_ERROR);
+        const category = await this.categoryService.findOneOrThrow({ id });
         return category;
     }
     async update(id, dto) {
-        const category = await this.categoryService.update(id, dto);
-        if (!category)
-            throw new common_1.NotFoundException(category_constants_1.CATEGORY_NOT_FOUND_ERROR);
+        const category = await this.categoryService.updateOne({ id }, dto);
         return category;
     }
     async remove(id) {
-        const category = await this.categoryService.remove(id);
-        if (!category)
-            throw new common_1.NotFoundException(category_constants_1.CATEGORY_NOT_FOUND_ERROR);
+        const category = await this.categoryService.remove({ id });
         return category;
     }
 };
 __decorate([
     (0, common_1.Post)(),
+    (0, check_policies_decorator_1.CheckPolicies)(new policy_handler_1.PolicyHandler(casl_types_type_1.Action.Create, category_entity_1.Category)),
+    openapi.ApiResponse({ status: 201, type: require("./entities/category.entity").Category }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_category_dto_1.CreateCategoryDto]),
@@ -56,12 +62,17 @@ __decorate([
 ], CategoryController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
+    (0, check_policies_decorator_1.CheckPolicies)(new policy_handler_1.PolicyHandler(casl_types_type_1.Action.ReadMany, category_entity_1.Category)),
+    openapi.ApiResponse({ status: 200, type: [require("./entities/category.entity").Category] }),
+    __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [pagination_query_dto_1.PaginationQueryDto]),
     __metadata("design:returntype", Promise)
-], CategoryController.prototype, "findAll", null);
+], CategoryController.prototype, "findMany", null);
 __decorate([
     (0, common_1.Get)(':id'),
+    (0, check_policies_decorator_1.CheckPolicies)(new policy_handler_1.PolicyHandler(casl_types_type_1.Action.ReadOne, category_entity_1.Category)),
+    openapi.ApiResponse({ status: 200, type: require("./entities/category.entity").Category }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -69,6 +80,8 @@ __decorate([
 ], CategoryController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)(':id'),
+    (0, check_policies_decorator_1.CheckPolicies)(new policy_handler_1.PolicyHandler(casl_types_type_1.Action.Update, category_entity_1.Category)),
+    openapi.ApiResponse({ status: 200, type: require("./entities/category.entity").Category }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -77,12 +90,15 @@ __decorate([
 ], CategoryController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
+    (0, check_policies_decorator_1.CheckPolicies)(new policy_handler_1.PolicyHandler(casl_types_type_1.Action.Delete, category_entity_1.Category)),
+    openapi.ApiResponse({ status: 200, type: require("./entities/category.entity").Category }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], CategoryController.prototype, "remove", null);
 CategoryController = __decorate([
+    (0, swagger_1.ApiTags)('category'),
     (0, common_1.Controller)('category'),
     __metadata("design:paramtypes", [category_service_1.CategoryService])
 ], CategoryController);

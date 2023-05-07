@@ -17,30 +17,34 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const category_entity_1 = require("./entities/category.entity");
+const custom_errors_1 = require("../errors/custom-errors");
+const category_constants_1 = require("./category.constants");
 let CategoryService = class CategoryService {
     constructor(categoryRepository) {
         this.categoryRepository = categoryRepository;
     }
-    async create(dto) {
-        const category = this.categoryRepository.create(dto);
+    async create(data) {
+        const category = this.categoryRepository.create(data);
         return this.categoryRepository.save(category);
     }
-    async findAll() {
-        return this.categoryRepository.find();
+    async findMany(options) {
+        return this.categoryRepository.find(options);
     }
-    async findOne(id) {
-        return this.categoryRepository.findOneBy({ id });
+    async findOne(where) {
+        return this.categoryRepository.findOneBy(where);
     }
-    async update(id, dto) {
-        const category = await this.findOne(id);
+    async findOneOrThrow(where) {
+        const category = await this.categoryRepository.findOneBy(where);
         if (!category)
-            return null;
-        return this.categoryRepository.save({ ...category, ...dto });
+            throw new custom_errors_1.EntityNotFoundCustomError(category_constants_1.CATEGORY_NOT_FOUND_ERROR);
+        return category;
     }
-    async remove(id) {
-        const category = await this.findOne(id);
-        if (!category)
-            return null;
+    async updateOne(where, data) {
+        const category = await this.findOneOrThrow(where);
+        return this.categoryRepository.save({ ...category, ...data });
+    }
+    async remove(where) {
+        const category = await this.findOneOrThrow(where);
         return this.categoryRepository.remove(category);
     }
 };

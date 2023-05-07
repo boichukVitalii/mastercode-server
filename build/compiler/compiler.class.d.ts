@@ -1,6 +1,7 @@
-import { CodeType, Language } from './dto/create-compiler.dto';
+import { CodeType } from './dto/compiler.dto';
 import { ResponseCompilerDto } from './dto/response-compiler.dto';
 import { Problem } from 'src/problem/entities/problem.entity';
+import { TLanguage } from 'src/user/entities/user-solved-problem.entity';
 export declare class Compiler {
     private readonly code;
     private readonly lang;
@@ -15,7 +16,7 @@ export declare class Compiler {
     private readonly testcasesInputsFilePath;
     private readonly testcasesOutputsFilePath;
     private readonly result;
-    constructor(code: CodeType, lang: Language, problem: Problem);
+    constructor(code: CodeType, lang: TLanguage, problem: Problem);
     private prepareEnv;
     compile(): Promise<ResponseCompilerDto>;
 }
