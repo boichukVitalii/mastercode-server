@@ -9,14 +9,17 @@ export declare class Compiler {
     private readonly imageName;
     private readonly containerName;
     private readonly dockerCompilerDir;
-    private readonly appFileName;
-    private readonly appFilePath;
+    private readonly solutionResultDir;
+    private readonly solutionFileName;
+    private readonly solutionFilePath;
     private readonly testcaseInputsJSON;
     private readonly testcaseOutputsJSON;
     private readonly testcasesInputsFilePath;
     private readonly testcasesOutputsFilePath;
-    private readonly result;
+    private readonly uniqueUserSolutionDir;
+    private result;
     constructor(code: CodeType, lang: TLanguage, problem: Problem);
     private prepareEnv;
+    private clear;
     compile(): Promise<ResponseCompilerDto>;
 }

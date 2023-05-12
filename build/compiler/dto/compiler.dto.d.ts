@@ -7,5 +7,5 @@ export declare class CompilerDto {
     lang: TLanguage;
     code: CodeType;
     problemId: string;
-    submit: boolean;
+    submit?: boolean;
 }

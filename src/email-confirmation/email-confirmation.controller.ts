@@ -10,16 +10,16 @@ import { ApiTags } from '@nestjs/swagger';
 export class EmailConfirmationController {
 	constructor(private readonly emailConfirmationService: EmailConfirmationService) {}
 
-	@Post('confirm')
 	@Public()
+	@Post('confirm')
 	@HttpCode(HttpStatus.NO_CONTENT)
 	async confirm(@Body() dto: ConfirmEmailDto): Promise<void> {
 		const email = await this.emailConfirmationService.decodeConfirmationToken(dto.token);
 		await this.emailConfirmationService.confirmEmail(email);
 	}
 
-	@Post('resend-confirmation-link')
 	@Public()
+	@Post('resend-confirmation-link')
 	@HttpCode(HttpStatus.NO_CONTENT)
 	async resendConfirmationLink(@GetCurrentUserId() userId: string): Promise<void> {
 		await this.emailConfirmationService.resendConfirmationLink(userId);

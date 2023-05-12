@@ -1,5 +1,6 @@
 # compiled output
 /dist
+/build
 /node_modules
 
 # Logs
@@ -37,5 +38,6 @@ lerna-debug.log*
 # Environment variables
 /.env
 
-#docker_compiler user file
-/docker_compiler/js/app.js
+# else
+/uploads
+/migrations

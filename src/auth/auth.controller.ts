@@ -80,7 +80,7 @@ export class AuthController {
 	@HttpCode(HttpStatus.OK)
 	async refreshTokens(
 		@GetCurrentUserId() userId: string,
-		@GetCurrentUser('refresh_token_hash') refreshToken: string,
+		@GetCurrentUser('refreshToken') refreshToken: string,
 	): Promise<TTokens> {
 		return this.authService.refreshTokens(userId, refreshToken);
 	}

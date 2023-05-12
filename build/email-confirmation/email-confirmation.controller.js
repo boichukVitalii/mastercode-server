@@ -33,8 +33,8 @@ let EmailConfirmationController = class EmailConfirmationController {
     }
 };
 __decorate([
-    (0, common_1.Post)('confirm'),
     (0, public_decorator_1.Public)(),
+    (0, common_1.Post)('confirm'),
     (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
     openapi.ApiResponse({ status: common_1.HttpStatus.NO_CONTENT }),
     __param(0, (0, common_1.Body)()),
@@ -43,8 +43,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], EmailConfirmationController.prototype, "confirm", null);
 __decorate([
-    (0, common_1.Post)('resend-confirmation-link'),
     (0, public_decorator_1.Public)(),
+    (0, common_1.Post)('resend-confirmation-link'),
     (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
     openapi.ApiResponse({ status: common_1.HttpStatus.NO_CONTENT }),
     __param(0, (0, get_current_userId_decorator_1.GetCurrentUserId)()),

@@ -7,6 +7,7 @@ export declare const Verdict: {
 export declare type TVerdict = typeof Verdict[keyof typeof Verdict];
 export declare class ResponseCompilerDto {
     verdict: TVerdict;
-    logs?: string;
+    logs: string;
     runTime?: string;
+    constructor(verdict: TVerdict, logs: string, runTime?: string);
 }

@@ -118,7 +118,7 @@ __decorate([
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     openapi.ApiResponse({ status: common_1.HttpStatus.OK, type: Object }),
     __param(0, (0, get_current_userId_decorator_1.GetCurrentUserId)()),
-    __param(1, (0, get_current_user_decorator_1.GetCurrentUser)('refresh_token_hash')),
+    __param(1, (0, get_current_user_decorator_1.GetCurrentUser)('refreshToken')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)

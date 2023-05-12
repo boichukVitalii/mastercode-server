@@ -9,8 +9,13 @@ exports.Verdict = {
     Error: 'Error',
 };
 class ResponseCompilerDto {
+    constructor(verdict, logs, runTime) {
+        this.verdict = verdict;
+        this.logs = logs;
+        this.runTime = runTime;
+    }
     static _OPENAPI_METADATA_FACTORY() {
-        return { verdict: { required: true, type: () => Object }, logs: { required: false, type: () => String }, runTime: { required: false, type: () => String } };
+        return { verdict: { required: true, type: () => Object }, logs: { required: true, type: () => String }, runTime: { required: false, type: () => String } };
     }
 }
 exports.ResponseCompilerDto = ResponseCompilerDto;
