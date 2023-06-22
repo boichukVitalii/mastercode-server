@@ -14,7 +14,6 @@ const openapi = require("@nestjs/swagger");
 const comment_entity_1 = require("../../comment/entities/comment.entity");
 const category_entity_1 = require("../../category/entities/category.entity");
 const typeorm_1 = require("typeorm");
-const user_entity_1 = require("../../user/entities/user.entity");
 const problem_reaction_entity_1 = require("./problem-reaction.entity");
 const user_solved_problem_entity_1 = require("../../user/entities/user-solved-problem.entity");
 exports.ProblemDifficulty = {
@@ -24,7 +23,7 @@ exports.ProblemDifficulty = {
 };
 let Problem = class Problem {
     static _OPENAPI_METADATA_FACTORY() {
-        return { id: { required: true, type: () => String }, title: { required: true, type: () => String }, description: { required: true, type: () => String }, difficulty: { required: true, type: () => Object }, solution: { required: true, type: () => String }, likes: { required: true, type: () => Number }, dislikes: { required: true, type: () => Number }, constraints: { required: true, type: () => [String] }, inputs: { required: true, type: () => Object }, outputs: { required: true, type: () => Object }, category: { required: true, type: () => require("../../category/entities/category.entity").Category }, comments: { required: true, type: () => [require("../../comment/entities/comment.entity").Comment] }, users: { required: true, type: () => [require("../../user/entities/user.entity").User] }, problems_reactions: { required: true, type: () => [require("./problem-reaction.entity").ProblemReaction] }, solved_problems: { required: true, type: () => [require("../../user/entities/user-solved-problem.entity").UserSolvedProblem] }, created_at: { required: true, type: () => Date }, updated_at: { required: true, type: () => Date } };
+        return { id: { required: true, type: () => String }, title: { required: true, type: () => String }, description: { required: true, type: () => String }, difficulty: { required: true, type: () => Object }, solution: { required: true, type: () => String }, likes: { required: true, type: () => Number }, dislikes: { required: true, type: () => Number }, constraints: { required: true, type: () => [String] }, inputs: { required: true, type: () => Object }, outputs: { required: true, type: () => Object }, category: { required: true, type: () => require("../../category/entities/category.entity").Category }, category_id: { required: true, type: () => String }, comments: { required: true, type: () => [require("../../comment/entities/comment.entity").Comment] }, problems_reactions: { required: true, type: () => [require("./problem-reaction.entity").ProblemReaction] }, solved_problems: { required: true, type: () => [require("../../user/entities/user-solved-problem.entity").UserSolvedProblem] }, created_at: { required: true, type: () => Date }, updated_at: { required: true, type: () => Date } };
     }
 };
 __decorate([
@@ -73,13 +72,13 @@ __decorate([
     __metadata("design:type", category_entity_1.Category)
 ], Problem.prototype, "category", void 0);
 __decorate([
+    (0, typeorm_1.Column)('uuid'),
+    __metadata("design:type", String)
+], Problem.prototype, "category_id", void 0);
+__decorate([
     (0, typeorm_1.OneToMany)(() => comment_entity_1.Comment, (comment) => comment.problem),
     __metadata("design:type", Array)
 ], Problem.prototype, "comments", void 0);
-__decorate([
-    (0, typeorm_1.ManyToMany)(() => user_entity_1.User),
-    __metadata("design:type", Array)
-], Problem.prototype, "users", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => problem_reaction_entity_1.ProblemReaction, (problemReaction) => problemReaction.problem),
     __metadata("design:type", Array)

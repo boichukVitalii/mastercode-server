@@ -1,4 +1,4 @@
-import { IsBoolean, IsEnum, IsObject, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsObject, IsString } from 'class-validator';
 import { Language, TLanguage } from 'src/user/entities/user-solved-problem.entity';
 
 export type CodeType = {
@@ -16,7 +16,6 @@ export class CompilerDto {
 	@IsString()
 	problemId: string;
 
-	@IsOptional()
 	@IsBoolean()
-	submit?: boolean;
+	submit: boolean;
 }

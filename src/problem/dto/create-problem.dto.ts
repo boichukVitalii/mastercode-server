@@ -19,7 +19,7 @@ export class CreateProblemDto {
 	constraints: string[];
 
 	@IsString()
-	category_id: number;
+	category_id: string;
 
 	@IsObject()
 	inputs: Record<string, any[]>;

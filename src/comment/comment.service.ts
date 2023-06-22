@@ -6,18 +6,35 @@ import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'type
 import { Comment } from './entities/comment.entity';
 import { EntityNotFoundCustomError } from 'src/errors/custom-errors';
 import { COMMENT_NOT_FOUND_ERROR } from './comment.constants';
+import { TJwtPayload } from 'src/auth/types';
+import { CommentQueryDto } from './dto/comment-query.dto';
 
 @Injectable()
 export class CommentService {
 	constructor(@InjectRepository(Comment) private readonly commentRepository: Repository<Comment>) {}
 
 	async create(data: DeepPartial<Comment>, user: User, problem: Problem): Promise<Comment> {
-		const comment = this.commentRepository.create({ ...data, user, problem });
+		const comment = this.commentRepository.create({
+			...data,
+			user,
+			problem: {
+				id: problem.id,
+			},
+		});
 		return this.commentRepository.save(comment);
 	}
 
-	async findMany(options: FindManyOptions<Comment>): Promise<Comment[]> {
-		return this.commentRepository.find(options);
+	async findMany(options: CommentQueryDto): Promise<Comment[]> {
+		const { skip, take, problem_id } = options;
+		return this.commentRepository.find({
+			skip,
+			take,
+			where: {
+				problem: {
+					id: problem_id,
+				},
+			},
+		});
 	}
 
 	async findOne(where: FindOptionsWhere<Comment>): Promise<Comment | null> {

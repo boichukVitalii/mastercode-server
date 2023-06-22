@@ -22,6 +22,7 @@ const typeorm_2 = require("typeorm");
 const user_entity_1 = require("./entities/user.entity");
 const user_constants_1 = require("./user.constants");
 const problem_service_1 = require("../problem/problem.service");
+const problem_entity_1 = require("../problem/entities/problem.entity");
 const user_solved_problem_entity_1 = require("./entities/user-solved-problem.entity");
 let UserService = class UserService {
     constructor(userRepository, userSolvedProblemRepository, problemService, fileService, dataSource) {
@@ -63,15 +64,15 @@ let UserService = class UserService {
         return this.userRepository.remove(user);
     }
     async uploadAvatar(file, userId) {
+        const user = await this.findOneOrThrow({ id: userId });
+        if (user.avatar_id)
+            await this.removeAvatar(userId);
         const bufferWebP = await this.fileService.convertToWebP(file.buffer);
         const filename = `avatar-${userId}.webp`;
         const mimetype = 'image/webp';
         const mfile = new mfile_class_1.MFile(filename, mimetype, bufferWebP);
         const folderToSave = 'avatars';
         const avatar = (await this.fileService.saveFiles([mfile], folderToSave))[0];
-        const user = await this.findOneOrThrow({ id: userId });
-        if (user.avatar_id)
-            await this.removeAvatar(userId);
         user.avatar_id = avatar.id;
         await this.userRepository.save({ ...user });
         return avatar;
@@ -113,6 +114,46 @@ let UserService = class UserService {
                 problem: true,
             },
         });
+    }
+    async getUserStatistics(userId) {
+        const solvedProblems = await this.getSolvedProblems(userId);
+        const numberOfSolvedProblems = solvedProblems.length;
+        const numberOfEasyProblems = await this.problemService.getNumberOfProblemsBy({
+            difficulty: problem_entity_1.ProblemDifficulty.EASY,
+        });
+        const numberOfMediumProblems = await this.problemService.getNumberOfProblemsBy({
+            difficulty: problem_entity_1.ProblemDifficulty.MEDIUM,
+        });
+        const numberOfHardProblems = await this.problemService.getNumberOfProblemsBy({
+            difficulty: problem_entity_1.ProblemDifficulty.HARD,
+        });
+        const numberOfSolvedEasyProblems = await this.userSolvedProblemRepository.countBy({
+            problem: {
+                difficulty: problem_entity_1.ProblemDifficulty.EASY,
+            },
+            user_id: userId,
+        });
+        const numberOfSolvedMediumProblems = await this.userSolvedProblemRepository.countBy({
+            problem: {
+                difficulty: problem_entity_1.ProblemDifficulty.MEDIUM,
+            },
+            user_id: userId,
+        });
+        const numberOfSolvedHardProblems = await this.userSolvedProblemRepository.countBy({
+            problem: {
+                difficulty: problem_entity_1.ProblemDifficulty.HARD,
+            },
+            user_id: userId,
+        });
+        return {
+            numberOfSolvedProblems,
+            numberOfEasyProblems,
+            numberOfHardProblems,
+            numberOfMediumProblems,
+            numberOfSolvedEasyProblems,
+            numberOfSolvedMediumProblems,
+            numberOfSolvedHardProblems,
+        };
     }
 };
 UserService = __decorate([

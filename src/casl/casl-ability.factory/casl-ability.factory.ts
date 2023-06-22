@@ -25,12 +25,12 @@ export class CaslAbilityFactory {
 			can(Action.Manage, [Problem, Category]);
 			can(Action.Create, Comment);
 		} else {
-			can([Action.ReadOne, Action.ReadMany], [Problem, Category, Comment]);
+			can([Action.ReadOne, Action.ReadMany], [Problem, Category, Comment, User]);
 			can(Action.Create, Comment);
 		}
 
 		can<FlatComment>([Action.Update, Action.Delete], Comment, { 'user.id': user.sub });
-		can([Action.Update, Action.ReadOne, Action.Upload, Action.Delete], User, { id: user.sub });
+		can([Action.Update, Action.Upload, Action.Delete], User, { id: user.sub });
 
 		return build({
 			detectSubjectType: (item) => item.constructor as ExtractSubjectType<Subjects>,

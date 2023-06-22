@@ -18,13 +18,7 @@ export class Comment {
 	@Column('text')
 	text: string;
 
-	@Column('int', { default: 0 })
-	thumbs_up: number;
-
-	@Column('int', { default: 0 })
-	thumbs_down: number;
-
-	@ManyToOne(() => User, (user: User) => user.comments, { onDelete: 'CASCADE' })
+	@ManyToOne(() => User, (user: User) => user.comments, { onDelete: 'CASCADE', eager: true })
 	@JoinColumn({ name: 'user_id' })
 	user: User;
 

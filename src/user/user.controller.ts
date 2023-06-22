@@ -45,6 +45,7 @@ import {
 import { AvatarResponseDto } from './dto/avatar-response.dto';
 import { AddSolvedProblemDto } from './dto/add-solved-problem.dto';
 import { UserSolvedProblem } from './entities/user-solved-problem.entity';
+import { UserStatistics } from './dto/user-statistics.dto';
 
 @ApiTags('user')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -63,6 +64,7 @@ export class UserController {
 	@Patch(':id')
 	@CheckPolicies(new PolicyHandler(Action.Update, User))
 	async update(@Param('id') id: string, @Body() dto: UpdateUserDto): Promise<AuthResponseDto> {
+		console.log(dto);
 		const user = await this.userService.updateOne({ id }, dto);
 		if (!user) throw new NotFoundException(USER_NOT_FOUND_ERROR);
 		return new AuthResponseDto(user);
@@ -88,7 +90,7 @@ export class UserController {
 		@UploadedFile(
 			new ParseFilePipeBuilder()
 				.addMaxSizeValidator({ maxSize: Math.pow(1024, 2) * 5 }) // 5mb
-				.addFileTypeValidator({ fileType: /png|jpeg|webp/ })
+				.addFileTypeValidator({ fileType: /png|jpeg|jpg|webp/ })
 				.build({
 					errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
 				}),
@@ -137,6 +139,12 @@ export class UserController {
 	// @CheckPolicies(new PolicyHandler(Action.ReadMany, User))
 	async getSolvedProblems(@GetCurrentUserId() id: string): Promise<UserSolvedProblem[]> {
 		return this.userService.getSolvedProblems(id);
+	}
+
+	@Get('statistics/:id')
+	// @CheckPolicies(new PolicyHandler(Action.ReadMany, User))
+	async getUserStatistics(@Param('id') id: string): Promise<UserStatistics> {
+		return this.userService.getUserStatistics(id);
 	}
 
 	@Get(':id')

@@ -1,6 +1,5 @@
 import { Comment } from 'src/comment/entities/comment.entity';
 import { Category } from 'src/category/entities/category.entity';
-import { User } from 'src/user/entities/user.entity';
 import { ProblemReaction } from './problem-reaction.entity';
 import { UserSolvedProblem } from 'src/user/entities/user-solved-problem.entity';
 export declare const ProblemDifficulty: {
@@ -21,8 +20,8 @@ export declare class Problem {
     inputs: Record<string, any[]>;
     outputs: Record<string, any[]>;
     category: Category;
+    category_id: string;
     comments: Comment[];
-    users: User[];
     problems_reactions: ProblemReaction[];
     solved_problems: UserSolvedProblem[];
     created_at: Date;

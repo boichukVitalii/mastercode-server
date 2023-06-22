@@ -16,7 +16,7 @@ const user_entity_1 = require("../../user/entities/user.entity");
 const typeorm_1 = require("typeorm");
 let Comment = class Comment {
     static _OPENAPI_METADATA_FACTORY() {
-        return { id: { required: true, type: () => String }, text: { required: true, type: () => String }, thumbs_up: { required: true, type: () => Number }, thumbs_down: { required: true, type: () => Number }, user: { required: true, type: () => require("../../user/entities/user.entity").User }, problem: { required: true, type: () => require("../../problem/entities/problem.entity").Problem }, created_at: { required: true, type: () => Date }, updated_at: { required: true, type: () => Date } };
+        return { id: { required: true, type: () => String }, text: { required: true, type: () => String }, user: { required: true, type: () => require("../../user/entities/user.entity").User }, problem: { required: true, type: () => require("../../problem/entities/problem.entity").Problem }, created_at: { required: true, type: () => Date }, updated_at: { required: true, type: () => Date } };
     }
 };
 __decorate([
@@ -28,15 +28,7 @@ __decorate([
     __metadata("design:type", String)
 ], Comment.prototype, "text", void 0);
 __decorate([
-    (0, typeorm_1.Column)('int', { default: 0 }),
-    __metadata("design:type", Number)
-], Comment.prototype, "thumbs_up", void 0);
-__decorate([
-    (0, typeorm_1.Column)('int', { default: 0 }),
-    __metadata("design:type", Number)
-], Comment.prototype, "thumbs_down", void 0);
-__decorate([
-    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.comments, { onDelete: 'CASCADE' }),
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.comments, { onDelete: 'CASCADE', eager: true }),
     (0, typeorm_1.JoinColumn)({ name: 'user_id' }),
     __metadata("design:type", user_entity_1.User)
 ], Comment.prototype, "user", void 0);

@@ -24,11 +24,11 @@ let CaslAbilityFactory = class CaslAbilityFactory {
             can(casl_types_type_1.Action.Create, comment_entity_1.Comment);
         }
         else {
-            can([casl_types_type_1.Action.ReadOne, casl_types_type_1.Action.ReadMany], [problem_entity_1.Problem, category_entity_1.Category, comment_entity_1.Comment]);
+            can([casl_types_type_1.Action.ReadOne, casl_types_type_1.Action.ReadMany], [problem_entity_1.Problem, category_entity_1.Category, comment_entity_1.Comment, user_entity_1.User]);
             can(casl_types_type_1.Action.Create, comment_entity_1.Comment);
         }
         can([casl_types_type_1.Action.Update, casl_types_type_1.Action.Delete], comment_entity_1.Comment, { 'user.id': user.sub });
-        can([casl_types_type_1.Action.Update, casl_types_type_1.Action.ReadOne, casl_types_type_1.Action.Upload, casl_types_type_1.Action.Delete], user_entity_1.User, { id: user.sub });
+        can([casl_types_type_1.Action.Update, casl_types_type_1.Action.Upload, casl_types_type_1.Action.Delete], user_entity_1.User, { id: user.sub });
         return build({
             detectSubjectType: (item) => item.constructor,
         });

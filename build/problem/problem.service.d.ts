@@ -15,4 +15,5 @@ export declare class ProblemService {
     remove(where: FindOptionsWhere<Problem>): Promise<Problem>;
     toggleReaction(problemId: string, userId: string, reactionType: TReactionType): Promise<ToggleReactionResponseDto>;
     private countChangedReactionsAndUpdate;
+    getNumberOfProblemsBy(where: FindOptionsWhere<Problem>): Promise<number>;
 }

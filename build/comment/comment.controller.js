@@ -16,26 +16,28 @@ exports.CommentController = void 0;
 const openapi = require("@nestjs/swagger");
 const common_1 = require("@nestjs/common");
 const check_policies_decorator_1 = require("../blocks/decorators/check-policies.decorator");
-const get_current_user_decorator_1 = require("../blocks/decorators/get-current-user.decorator");
 const policy_handler_1 = require("../blocks/handlers/policy.handler");
 const casl_types_type_1 = require("../casl/types/casl-types.type");
-const pagination_query_dto_1 = require("../common/dto/pagination-query.dto");
 const problem_constants_1 = require("../problem/problem.constants");
 const problem_service_1 = require("../problem/problem.service");
-const user_entity_1 = require("../user/entities/user.entity");
 const comment_constants_1 = require("./comment.constants");
 const comment_service_1 = require("./comment.service");
 const create_comment_dto_1 = require("./dto/create-comment.dto");
 const update_comment_dto_1 = require("./dto/update-comment.dto");
 const comment_entity_1 = require("./entities/comment.entity");
 const swagger_1 = require("@nestjs/swagger");
+const user_service_1 = require("../user/user.service");
+const get_current_userId_decorator_1 = require("../blocks/decorators/get-current-userId.decorator");
+const comment_query_dto_1 = require("./dto/comment-query.dto");
 let CommentController = class CommentController {
-    constructor(commentService, problemService) {
+    constructor(commentService, problemService, userService) {
         this.commentService = commentService;
         this.problemService = problemService;
+        this.userService = userService;
     }
-    async create(dto, user) {
-        const problem = await this.problemService.findOne({ id: dto.problemId });
+    async create(dto, user_id) {
+        const problem = await this.problemService.findOneOrThrow({ id: dto.problemId });
+        const user = await this.userService.findOneOrThrow({ id: user_id });
         if (!problem)
             throw new common_1.BadRequestException(problem_constants_1.PROBLEM_NOT_FOUND_ERROR);
         return this.commentService.create(dto, user, problem);
@@ -63,9 +65,9 @@ __decorate([
     (0, check_policies_decorator_1.CheckPolicies)(new policy_handler_1.PolicyHandler(casl_types_type_1.Action.Create, comment_entity_1.Comment)),
     openapi.ApiResponse({ status: 201, type: require("./entities/comment.entity").Comment }),
     __param(0, (0, common_1.Body)()),
-    __param(1, (0, get_current_user_decorator_1.GetCurrentUser)()),
+    __param(1, (0, get_current_userId_decorator_1.GetCurrentUserId)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_comment_dto_1.CreateCommentDto, user_entity_1.User]),
+    __metadata("design:paramtypes", [create_comment_dto_1.CreateCommentDto, String]),
     __metadata("design:returntype", Promise)
 ], CommentController.prototype, "create", null);
 __decorate([
@@ -74,7 +76,7 @@ __decorate([
     openapi.ApiResponse({ status: 200, type: [require("./entities/comment.entity").Comment] }),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [pagination_query_dto_1.PaginationQueryDto]),
+    __metadata("design:paramtypes", [comment_query_dto_1.CommentQueryDto]),
     __metadata("design:returntype", Promise)
 ], CommentController.prototype, "findMany", null);
 __decorate([
@@ -110,7 +112,8 @@ CommentController = __decorate([
     (0, swagger_1.ApiTags)('comment'),
     (0, common_1.Controller)('comment'),
     __metadata("design:paramtypes", [comment_service_1.CommentService,
-        problem_service_1.ProblemService])
+        problem_service_1.ProblemService,
+        user_service_1.UserService])
 ], CommentController);
 exports.CommentController = CommentController;
 //# sourceMappingURL=comment.controller.js.map

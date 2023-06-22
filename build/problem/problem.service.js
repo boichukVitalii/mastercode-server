@@ -40,6 +40,9 @@ let ProblemService = class ProblemService {
                 difficulty,
                 title,
             },
+            relations: {
+                category: true,
+            },
         });
     }
     async findOne(where) {
@@ -91,6 +94,9 @@ let ProblemService = class ProblemService {
             return problem2;
         }
         return problem1;
+    }
+    async getNumberOfProblemsBy(where) {
+        return await this.problemRepository.countBy(where);
     }
 };
 ProblemService = __decorate([

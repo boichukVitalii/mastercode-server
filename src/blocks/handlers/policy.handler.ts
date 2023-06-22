@@ -21,6 +21,7 @@ export class PolicyHandler implements IPolicyHandler {
 		if (!id) return ability.can(this.action, this.entity as Subjects);
 		const dataSource = await config.dataSourceInit;
 		const record = await dataSource.getRepository(this.entity).findOneByOrFail({ id });
+		console.log('Record', record);
 		return ability.can(this.action, record);
 	}
 }

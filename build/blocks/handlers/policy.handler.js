@@ -15,6 +15,7 @@ class PolicyHandler {
             return ability.can(this.action, this.entity);
         const dataSource = await config_1.default.dataSourceInit;
         const record = await dataSource.getRepository(this.entity).findOneByOrFail({ id });
+        console.log('Record', record);
         return ability.can(this.action, record);
     }
 }

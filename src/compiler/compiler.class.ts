@@ -1,10 +1,10 @@
-import { CodeType } from './dto/compiler.dto';
-import { ResponseCompilerDto, Verdict } from './dto/response-compiler.dto';
 import { Problem } from 'src/problem/entities/problem.entity';
 import { TLanguage } from 'src/user/entities/user-solved-problem.entity';
+import { ResponseCompilerDto, Verdict } from './dto/response-compiler.dto';
+import { CodeType } from './dto/compiler.dto';
 
+import * as fsp from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
-import { writeFileSync, mkdirSync, readFileSync, cpSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawn } from 'node:child_process';
 
@@ -15,14 +15,17 @@ export class Compiler {
 	private readonly imageName: string;
 	private readonly containerName: string;
 	private readonly dockerCompilerDir: string;
-	private readonly solutionResultDir: string;
+	private readonly uniqueUserSolutionDockerImgDir: string;
+	private readonly solutionResultDirInDockerImgDir: string;
+	private readonly solutionResultDirInDocker: string;
+	private readonly solutionResultDirInHostFS: string;
+	private readonly solutionResultFileInHostFS: string;
 	private readonly solutionFileName: string;
 	private readonly solutionFilePath: string;
-	private readonly testcaseInputsJSON: string;
-	private readonly testcaseOutputsJSON: string;
+	private readonly testcasesInputsJSON: string;
+	private readonly testcasesOutputsJSON: string;
 	private readonly testcasesInputsFilePath: string;
 	private readonly testcasesOutputsFilePath: string;
-	private readonly uniqueUserSolutionDir: string;
 	private result: ResponseCompilerDto;
 
 	constructor(code: CodeType, lang: TLanguage, problem: Problem) {
@@ -34,47 +37,51 @@ export class Compiler {
 		this.containerName = randomUUID();
 
 		this.dockerCompilerDir = join(process.cwd(), 'docker_compiler', this.lang);
-		this.solutionResultDir = join(process.cwd(), '..', 'results', this.lang, randomUUID());
+		this.uniqueUserSolutionDockerImgDir = join(process.cwd(), '..', 'images', randomUUID());
+		this.solutionResultDirInDockerImgDir = join(this.uniqueUserSolutionDockerImgDir, 'result');
+		this.solutionResultDirInDocker = join('/opt', 'app', 'result');
+		this.solutionResultDirInHostFS = join(process.cwd(), '..', 'results', this.lang, randomUUID());
+		this.solutionResultFileInHostFS = join(this.solutionResultDirInHostFS, 'result.txt');
 		this.solutionFileName = `solution.${this.lang}`;
+		this.solutionFilePath = join(this.uniqueUserSolutionDockerImgDir, this.solutionFileName);
 
-		this.uniqueUserSolutionDir = join(process.cwd(), '..', 'images', randomUUID());
-
-		this.solutionFilePath = join(this.uniqueUserSolutionDir, this.solutionFileName);
-
-		this.testcaseInputsJSON = JSON.stringify(this.problem.inputs);
-		this.testcaseOutputsJSON = JSON.stringify(this.problem.outputs);
-
-		this.testcasesInputsFilePath = join(this.uniqueUserSolutionDir, 'testcasesInputs.json');
-		this.testcasesOutputsFilePath = join(this.uniqueUserSolutionDir, 'testcasesOutputs.json');
+		this.testcasesInputsJSON = JSON.stringify(this.problem.inputs);
+		this.testcasesOutputsJSON = JSON.stringify(this.problem.outputs);
+		this.testcasesInputsFilePath = join(
+			this.uniqueUserSolutionDockerImgDir,
+			'testcasesInputs.json',
+		);
+		this.testcasesOutputsFilePath = join(
+			this.uniqueUserSolutionDockerImgDir,
+			'testcasesOutputs.json',
+		);
 	}
 
-	private prepareEnv(): void {
-		mkdirSync(this.uniqueUserSolutionDir, { recursive: true });
-		cpSync(this.dockerCompilerDir, this.uniqueUserSolutionDir, { recursive: true });
+	private async prepareEnv(): Promise<void> {
+		await fsp.mkdir(this.uniqueUserSolutionDockerImgDir, { recursive: true });
+		await fsp.cp(this.dockerCompilerDir, this.uniqueUserSolutionDockerImgDir, { recursive: true });
+		await fsp.mkdir(this.solutionResultDirInDockerImgDir, { recursive: true });
+		await fsp.mkdir(this.solutionResultDirInHostFS, { recursive: true });
 
-		writeFileSync(this.testcasesInputsFilePath, this.testcaseInputsJSON);
-		writeFileSync(this.testcasesOutputsFilePath, this.testcaseOutputsJSON);
-		writeFileSync(this.solutionFilePath, Buffer.from(this.code.data));
-
-		mkdirSync(join(this.uniqueUserSolutionDir, 'result'), { recursive: true });
-
-		mkdirSync(this.solutionResultDir, { recursive: true });
+		await fsp.writeFile(this.testcasesInputsFilePath, this.testcasesInputsJSON);
+		await fsp.writeFile(this.testcasesOutputsFilePath, this.testcasesOutputsJSON);
+		await fsp.writeFile(this.solutionFilePath, Buffer.from(this.code.data));
 	}
 
-	private clear(): void {
-		rmSync(this.uniqueUserSolutionDir, { recursive: true, force: true });
-		rmSync(this.solutionResultDir, { recursive: true, force: true });
+	private async clear(): Promise<void> {
+		await fsp.rm(this.uniqueUserSolutionDockerImgDir, { recursive: true, force: true });
+		await fsp.rm(this.solutionResultDirInHostFS, { recursive: true, force: true });
 	}
 
-	public compile(): Promise<ResponseCompilerDto> {
-		this.prepareEnv();
+	public async compile(): Promise<ResponseCompilerDto> {
+		await this.prepareEnv();
 		return new Promise((resolve, reject) => {
-			const data: Buffer[] = []; // currently unused in response
+			const logData: Buffer[] = []; // currently unused in response
 			const errData: Buffer[] = [];
 
 			const dockerBuild = spawn('docker', [
 				'build',
-				this.uniqueUserSolutionDir,
+				this.uniqueUserSolutionDockerImgDir,
 				'-t',
 				this.imageName,
 			]);
@@ -85,13 +92,13 @@ export class Compiler {
 					'--name',
 					this.containerName,
 					'-v',
-					`${this.solutionResultDir}:/opt/app/result`,
+					`${this.solutionResultDirInHostFS}:${this.solutionResultDirInDocker}`,
 					this.imageName,
 				]);
 
-				dockerRun.stdout.on('data', (chunk) => data.push(chunk));
+				dockerRun.stdout.on('data', (chunk) => logData.push(chunk));
 
-				dockerRun.on('exit', () => {
+				dockerRun.on('exit', async () => {
 					if (errData.length) {
 						const logs = Buffer.concat(errData).toString();
 						const modifiedLogs = logs
@@ -101,32 +108,41 @@ export class Compiler {
 							.replace(/  +/g, ' ');
 						this.result = new ResponseCompilerDto(Verdict.Error, modifiedLogs);
 					} else {
-						const [resultData, runTime] = readFileSync(
-							`${this.solutionResultDir}/result.txt`,
-							'utf-8',
+						const logs = Buffer.concat(logData).toString();
+						const [resultData, runTime] = (
+							await fsp.readFile(this.solutionResultFileInHostFS, 'utf-8')
 						).split('\n');
 						const verdict = resultData.includes(Verdict.Accepted)
 							? Verdict.Accepted
 							: Verdict.WrongAnswer;
-						this.result = new ResponseCompilerDto(verdict, resultData, runTime);
+						this.result = new ResponseCompilerDto(verdict, logs, runTime);
 					}
-
 					resolve(this.result);
 
 					const rmDocContainer = spawn('docker', ['rm', this.containerName]);
 					rmDocContainer.on('exit', () => spawn('docker', ['rmi', this.imageName]));
 
-					this.clear();
+					await this.clear();
 				});
 
 				dockerRun.stderr.on('data', (errChunk) => errData.push(errChunk));
+				dockerRun.stderr.on('end', async () => await this.clear());
 
-				dockerRun.on('error', (err) => reject(err));
+				dockerRun.on('error', async (err) => {
+					await this.clear();
+					reject(err);
+				});
 			});
 
-			dockerBuild.stderr.on('data', (errChunk) => reject(errChunk.toString()));
+			dockerBuild.stderr.on('data', async (errChunk) => {
+				await this.clear();
+				reject(errChunk.toString());
+			});
 
-			dockerBuild.on('error', (err) => reject(err));
+			dockerBuild.on('error', async (err) => {
+				await this.clear();
+				reject(err);
+			});
 		});
 	}
 }

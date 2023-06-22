@@ -5,7 +5,7 @@ export declare class CreateProblemDto {
     difficulty: TProblemDifficulty;
     solution: string;
     constraints: string[];
-    category_id: number;
+    category_id: string;
     inputs: Record<string, any[]>;
     outputs: Record<string, any[]>;
 }

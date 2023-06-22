@@ -3,8 +3,6 @@ import { User } from 'src/user/entities/user.entity';
 export declare class Comment {
     id: string;
     text: string;
-    thumbs_up: number;
-    thumbs_down: number;
     user: User;
     problem: Problem;
     created_at: Date;

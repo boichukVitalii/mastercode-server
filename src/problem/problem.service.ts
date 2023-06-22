@@ -32,6 +32,9 @@ export class ProblemService {
 				difficulty,
 				title,
 			},
+			relations: {
+				category: true,
+			},
 		});
 	}
 
@@ -111,5 +114,9 @@ export class ProblemService {
 			return problem2;
 		}
 		return problem1;
+	}
+
+	async getNumberOfProblemsBy(where: FindOptionsWhere<Problem>): Promise<number> {
+		return await this.problemRepository.countBy(where);
 	}
 }

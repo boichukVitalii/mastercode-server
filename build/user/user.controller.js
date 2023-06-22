@@ -41,6 +41,7 @@ let UserController = class UserController {
         return users.map((user) => new auth_response_dto_1.AuthResponseDto(user));
     }
     async update(id, dto) {
+        console.log(dto);
         const user = await this.userService.updateOne({ id }, dto);
         if (!user)
             throw new common_1.NotFoundException(user_constants_1.USER_NOT_FOUND_ERROR);
@@ -74,6 +75,9 @@ let UserController = class UserController {
     }
     async getSolvedProblems(id) {
         return this.userService.getSolvedProblems(id);
+    }
+    async getUserStatistics(id) {
+        return this.userService.getUserStatistics(id);
     }
     async findOne(id) {
         const user = await this.userService.findOne({ id });
@@ -123,7 +127,7 @@ __decorate([
     openapi.ApiResponse({ status: common_1.HttpStatus.OK, type: require("./dto/avatar-response.dto").AvatarResponseDto }),
     __param(0, (0, common_1.UploadedFile)(new common_1.ParseFilePipeBuilder()
         .addMaxSizeValidator({ maxSize: Math.pow(1024, 2) * 5 })
-        .addFileTypeValidator({ fileType: /png|jpeg|webp/ })
+        .addFileTypeValidator({ fileType: /png|jpeg|jpg|webp/ })
         .build({
         errorHttpStatusCode: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
     }))),
@@ -170,6 +174,14 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getSolvedProblems", null);
+__decorate([
+    (0, common_1.Get)('statistics/:id'),
+    openapi.ApiResponse({ status: 200, type: require("./dto/user-statistics.dto").UserStatistics }),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "getUserStatistics", null);
 __decorate([
     (0, common_1.Get)(':id'),
     (0, check_policies_decorator_1.CheckPolicies)(new policy_handler_1.PolicyHandler(casl_types_type_1.Action.ReadOne, user_entity_1.User)),

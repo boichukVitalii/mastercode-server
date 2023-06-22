@@ -15,7 +15,7 @@ const class_validator_1 = require("class-validator");
 const problem_entity_1 = require("../entities/problem.entity");
 class CreateProblemDto {
     static _OPENAPI_METADATA_FACTORY() {
-        return { title: { required: true, type: () => String }, description: { required: true, type: () => String }, difficulty: { required: true, type: () => Object }, solution: { required: true, type: () => String }, constraints: { required: true, type: () => [String] }, category_id: { required: true, type: () => Number }, inputs: { required: true, type: () => Object }, outputs: { required: true, type: () => Object } };
+        return { title: { required: true, type: () => String }, description: { required: true, type: () => String }, difficulty: { required: true, type: () => Object }, solution: { required: true, type: () => String }, constraints: { required: true, type: () => [String] }, category_id: { required: true, type: () => String }, inputs: { required: true, type: () => Object }, outputs: { required: true, type: () => Object } };
     }
 }
 __decorate([
@@ -41,7 +41,7 @@ __decorate([
 ], CreateProblemDto.prototype, "constraints", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
-    __metadata("design:type", Number)
+    __metadata("design:type", String)
 ], CreateProblemDto.prototype, "category_id", void 0);
 __decorate([
     (0, class_validator_1.IsObject)(),

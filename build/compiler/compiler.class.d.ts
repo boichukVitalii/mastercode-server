@@ -1,7 +1,7 @@
-import { CodeType } from './dto/compiler.dto';
-import { ResponseCompilerDto } from './dto/response-compiler.dto';
 import { Problem } from 'src/problem/entities/problem.entity';
 import { TLanguage } from 'src/user/entities/user-solved-problem.entity';
+import { ResponseCompilerDto } from './dto/response-compiler.dto';
+import { CodeType } from './dto/compiler.dto';
 export declare class Compiler {
     private readonly code;
     private readonly lang;
@@ -9,14 +9,17 @@ export declare class Compiler {
     private readonly imageName;
     private readonly containerName;
     private readonly dockerCompilerDir;
-    private readonly solutionResultDir;
+    private readonly uniqueUserSolutionDockerImgDir;
+    private readonly solutionResultDirInDockerImgDir;
+    private readonly solutionResultDirInDocker;
+    private readonly solutionResultDirInHostFS;
+    private readonly solutionResultFileInHostFS;
     private readonly solutionFileName;
     private readonly solutionFilePath;
-    private readonly testcaseInputsJSON;
-    private readonly testcaseOutputsJSON;
+    private readonly testcasesInputsJSON;
+    private readonly testcasesOutputsJSON;
     private readonly testcasesInputsFilePath;
     private readonly testcasesOutputsFilePath;
-    private readonly uniqueUserSolutionDir;
     private result;
     constructor(code: CodeType, lang: TLanguage, problem: Problem);
     private prepareEnv;

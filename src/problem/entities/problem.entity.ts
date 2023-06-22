@@ -59,11 +59,14 @@ export class Problem {
 	@JoinColumn({ name: 'category_id' })
 	category: Category;
 
+	@Column('uuid')
+	category_id: string;
+
 	@OneToMany(() => Comment, (comment) => comment.problem)
 	comments: Comment[];
 
-	@ManyToMany(() => User)
-	users: User[];
+	// @ManyToMany(() => User)
+	// users: User[];
 
 	@OneToMany(() => ProblemReaction, (problemReaction) => problemReaction.problem)
 	problems_reactions: ProblemReaction[];

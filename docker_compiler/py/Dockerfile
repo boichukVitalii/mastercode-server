@@ -1,4 +1,4 @@
-FROM node:18-alpine 
+FROM python:3.8-slim-buster 
 WORKDIR /opt/app 
 COPY . . 
-CMD [ "node", "./executor.js" ]
+CMD [ "python3", "./executor.py" ]

@@ -14,11 +14,12 @@ const typeorm_1 = require("@nestjs/typeorm");
 const comment_entity_1 = require("./entities/comment.entity");
 const problem_module_1 = require("../problem/problem.module");
 const casl_module_1 = require("../casl/casl.module");
+const user_module_1 = require("../user/user.module");
 let CommentModule = class CommentModule {
 };
 CommentModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([comment_entity_1.Comment]), problem_module_1.ProblemModule, casl_module_1.CaslModule],
+        imports: [typeorm_1.TypeOrmModule.forFeature([comment_entity_1.Comment]), problem_module_1.ProblemModule, casl_module_1.CaslModule, user_module_1.UserModule],
         controllers: [comment_controller_1.CommentController],
         providers: [comment_service_1.CommentService],
     })

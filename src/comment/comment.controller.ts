@@ -26,6 +26,10 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Comment } from './entities/comment.entity';
 import { ApiTags } from '@nestjs/swagger';
+import { TJwtPayload } from 'src/auth/types';
+import { UserService } from 'src/user/user.service';
+import { GetCurrentUserId } from 'src/blocks/decorators/get-current-userId.decorator';
+import { CommentQueryDto } from './dto/comment-query.dto';
 
 @ApiTags('comment')
 @Controller('comment')
@@ -33,19 +37,24 @@ export class CommentController {
 	constructor(
 		private readonly commentService: CommentService,
 		private readonly problemService: ProblemService,
+		private readonly userService: UserService,
 	) {}
 
 	@Post()
 	@CheckPolicies(new PolicyHandler(Action.Create, Comment))
-	async create(@Body() dto: CreateCommentDto, @GetCurrentUser() user: User): Promise<Comment> {
-		const problem = await this.problemService.findOne({ id: dto.problemId });
+	async create(
+		@Body() dto: CreateCommentDto,
+		@GetCurrentUserId() user_id: string,
+	): Promise<Comment> {
+		const problem = await this.problemService.findOneOrThrow({ id: dto.problemId });
+		const user = await this.userService.findOneOrThrow({ id: user_id });
 		if (!problem) throw new BadRequestException(PROBLEM_NOT_FOUND_ERROR);
 		return this.commentService.create(dto, user, problem);
 	}
 
 	@Get()
 	@CheckPolicies(new PolicyHandler(Action.ReadMany, Comment))
-	async findMany(@Query() query: PaginationQueryDto): Promise<Comment[]> {
+	async findMany(@Query() query: CommentQueryDto): Promise<Comment[]> {
 		const comments = await this.commentService.findMany(query);
 		if (!comments.length) throw new NotFoundException(COMMENTS_NOT_FOUND_ERROR);
 		return comments;

@@ -24,11 +24,26 @@ let CommentService = class CommentService {
         this.commentRepository = commentRepository;
     }
     async create(data, user, problem) {
-        const comment = this.commentRepository.create({ ...data, user, problem });
+        const comment = this.commentRepository.create({
+            ...data,
+            user,
+            problem: {
+                id: problem.id,
+            },
+        });
         return this.commentRepository.save(comment);
     }
     async findMany(options) {
-        return this.commentRepository.find(options);
+        const { skip, take, problem_id } = options;
+        return this.commentRepository.find({
+            skip,
+            take,
+            where: {
+                problem: {
+                    id: problem_id,
+                },
+            },
+        });
     }
     async findOne(where) {
         return this.commentRepository.findOneBy(where);

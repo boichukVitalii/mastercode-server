@@ -11,21 +11,37 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CompilerService = void 0;
 const common_1 = require("@nestjs/common");
+const response_compiler_dto_1 = require("./dto/response-compiler.dto");
 const problem_service_1 = require("../problem/problem.service");
 const compiler_class_1 = require("./compiler.class");
+const user_service_1 = require("../user/user.service");
 let CompilerService = class CompilerService {
-    constructor(problemService) {
+    constructor(problemService, userService) {
         this.problemService = problemService;
+        this.userService = userService;
     }
-    async compile({ code, lang, problemId }) {
+    async compile({ code, lang, problemId, submit }, userId) {
         const problem = await this.problemService.findOneOrThrow({ id: problemId });
         const compiler = new compiler_class_1.Compiler(code, lang, problem);
-        return compiler.compile();
+        const result = await compiler.compile();
+        if (submit && result.verdict === response_compiler_dto_1.Verdict.Accepted) {
+            await this.userService.addSolvedProblem({
+                problem_id: problemId,
+                user_id: userId,
+                run_time: parseFloat(result.runTime),
+                language: lang,
+            });
+        }
+        if (!submit && result.verdict === response_compiler_dto_1.Verdict.Accepted) {
+            result.verdict = response_compiler_dto_1.Verdict.Correct;
+        }
+        return result;
     }
 };
 CompilerService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [problem_service_1.ProblemService])
+    __metadata("design:paramtypes", [problem_service_1.ProblemService,
+        user_service_1.UserService])
 ], CompilerService);
 exports.CompilerService = CompilerService;
 //# sourceMappingURL=compiler.service.js.map

@@ -9,10 +9,11 @@ import { User } from './entities/user.entity';
 import { USER_NOT_FOUND_ERROR } from './user.constants';
 import { ProblemService } from 'src/problem/problem.service';
 import { PROBLEM_NOT_FOUND_ERROR } from 'src/problem/problem.constants';
-import { Problem } from 'src/problem/entities/problem.entity';
+import { Problem, ProblemDifficulty } from 'src/problem/entities/problem.entity';
 import { UserSolvedProblem } from './entities/user-solved-problem.entity';
 import { AddSolvedProblemDto } from './dto/add-solved-problem.dto';
 import { UserQueryDto } from './dto/user-query.dto';
+import { UserStatistics } from './dto/user-statistics.dto';
 
 @Injectable()
 export class UserService {
@@ -63,15 +64,15 @@ export class UserService {
 	}
 
 	async uploadAvatar(file: Express.Multer.File, userId: string): Promise<File> {
+		const user = await this.findOneOrThrow({ id: userId });
+		if (user.avatar_id) await this.removeAvatar(userId);
+
 		const bufferWebP = await this.fileService.convertToWebP(file.buffer);
 		const filename = `avatar-${userId}.webp`;
 		const mimetype = 'image/webp';
 		const mfile = new MFile(filename, mimetype, bufferWebP);
 		const folderToSave = 'avatars';
 		const avatar = (await this.fileService.saveFiles([mfile], folderToSave))[0];
-		const user = await this.findOneOrThrow({ id: userId });
-
-		if (user.avatar_id) await this.removeAvatar(userId);
 
 		user.avatar_id = avatar.id;
 		await this.userRepository.save({ ...user });
@@ -120,5 +121,46 @@ export class UserService {
 				problem: true,
 			},
 		});
+	}
+
+	async getUserStatistics(userId: string): Promise<UserStatistics> {
+		const solvedProblems = await this.getSolvedProblems(userId);
+		const numberOfSolvedProblems = solvedProblems.length;
+		const numberOfEasyProblems = await this.problemService.getNumberOfProblemsBy({
+			difficulty: ProblemDifficulty.EASY,
+		});
+		const numberOfMediumProblems = await this.problemService.getNumberOfProblemsBy({
+			difficulty: ProblemDifficulty.MEDIUM,
+		});
+		const numberOfHardProblems = await this.problemService.getNumberOfProblemsBy({
+			difficulty: ProblemDifficulty.HARD,
+		});
+		const numberOfSolvedEasyProblems = await this.userSolvedProblemRepository.countBy({
+			problem: {
+				difficulty: ProblemDifficulty.EASY,
+			},
+			user_id: userId,
+		});
+		const numberOfSolvedMediumProblems = await this.userSolvedProblemRepository.countBy({
+			problem: {
+				difficulty: ProblemDifficulty.MEDIUM,
+			},
+			user_id: userId,
+		});
+		const numberOfSolvedHardProblems = await this.userSolvedProblemRepository.countBy({
+			problem: {
+				difficulty: ProblemDifficulty.HARD,
+			},
+			user_id: userId,
+		});
+		return {
+			numberOfSolvedProblems,
+			numberOfEasyProblems,
+			numberOfHardProblems,
+			numberOfMediumProblems,
+			numberOfSolvedEasyProblems,
+			numberOfSolvedMediumProblems,
+			numberOfSolvedHardProblems,
+		};
 	}
 }
