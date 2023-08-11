@@ -1,4 +1,4 @@
-export class UserStatistics {
+export class UserStatisticsDto {
 	numberOfSolvedProblems: number;
 	numberOfEasyProblems: number;
 	numberOfHardProblems: number;

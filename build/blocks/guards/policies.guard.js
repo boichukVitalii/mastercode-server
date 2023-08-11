@@ -14,6 +14,8 @@ const common_1 = require("@nestjs/common");
 const core_1 = require("@nestjs/core");
 const casl_ability_factory_1 = require("../../casl/casl-ability.factory/casl-ability.factory");
 const check_policies_decorator_1 = require("../decorators/check-policies.decorator");
+const urlStartsWith = '/api/';
+const dbVerificationDependentResources = ['comment'];
 let PoliciesGuard = class PoliciesGuard {
     constructor(reflector, caslAbilityFactory) {
         this.reflector = reflector;
@@ -27,10 +29,16 @@ let PoliciesGuard = class PoliciesGuard {
         if (isPublic)
             return true;
         const policyHandlers = this.reflector.get(check_policies_decorator_1.CHECK_POLICIES_KEY, context.getHandler()) || [];
+        if (!policyHandlers.length)
+            return true;
         const request = context.switchToHttp().getRequest();
         const user = request.user;
-        const id = request.params.id;
-        const ability = this.caslAbilityFactory.createForUser(user);
+        let id = request.params.id;
+        const ability = this.caslAbilityFactory.createForUser(user, id);
+        if (id &&
+            !dbVerificationDependentResources.some((resource) => request.url.startsWith(urlStartsWith + resource))) {
+            id = undefined;
+        }
         for (const handler of policyHandlers) {
             const result = await handler.handle(ability, id);
             if (!result)

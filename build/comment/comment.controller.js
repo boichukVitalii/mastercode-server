@@ -18,7 +18,6 @@ const common_1 = require("@nestjs/common");
 const check_policies_decorator_1 = require("../blocks/decorators/check-policies.decorator");
 const policy_handler_1 = require("../blocks/handlers/policy.handler");
 const casl_types_type_1 = require("../casl/types/casl-types.type");
-const problem_constants_1 = require("../problem/problem.constants");
 const problem_service_1 = require("../problem/problem.service");
 const comment_constants_1 = require("./comment.constants");
 const comment_service_1 = require("./comment.service");
@@ -35,11 +34,9 @@ let CommentController = class CommentController {
         this.problemService = problemService;
         this.userService = userService;
     }
-    async create(dto, user_id) {
+    async create(dto, userId) {
         const problem = await this.problemService.findOneOrThrow({ id: dto.problemId });
-        const user = await this.userService.findOneOrThrow({ id: user_id });
-        if (!problem)
-            throw new common_1.BadRequestException(problem_constants_1.PROBLEM_NOT_FOUND_ERROR);
+        const user = await this.userService.findOneOrThrow({ id: userId });
         return this.commentService.create(dto, user, problem);
     }
     async findMany(query) {

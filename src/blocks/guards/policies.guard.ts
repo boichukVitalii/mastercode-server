@@ -6,6 +6,9 @@ import { CaslAbilityFactory } from 'src/casl/casl-ability.factory/casl-ability.f
 import { IPolicyHandler } from 'src/casl/types/casl-types.type';
 import { CHECK_POLICIES_KEY } from '../decorators/check-policies.decorator';
 
+const urlStartsWith = '/api/';
+const dbVerificationDependentResources = ['comment'];
+
 @Injectable()
 export class PoliciesGuard implements CanActivate {
 	constructor(private reflector: Reflector, private caslAbilityFactory: CaslAbilityFactory) {}
@@ -19,11 +22,21 @@ export class PoliciesGuard implements CanActivate {
 
 		const policyHandlers =
 			this.reflector.get<IPolicyHandler[]>(CHECK_POLICIES_KEY, context.getHandler()) || [];
+		if (!policyHandlers.length) return true;
 
 		const request = context.switchToHttp().getRequest<Request>();
 		const user = request.user as TJwtPayload;
-		const id: string | undefined = request.params.id;
-		const ability = this.caslAbilityFactory.createForUser(user);
+		let id: string | undefined = request.params.id;
+		const ability = this.caslAbilityFactory.createForUser(user, id);
+
+		if (
+			id &&
+			!dbVerificationDependentResources.some((resource) =>
+				request.url.startsWith(urlStartsWith + resource),
+			)
+		) {
+			id = undefined;
+		}
 
 		for (const handler of policyHandlers) {
 			const result = await handler.handle(ability, id);

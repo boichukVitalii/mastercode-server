@@ -12,7 +12,6 @@ export declare const Action: {
     readonly ReadMany: "read_many";
     readonly Update: "update";
     readonly Delete: "delete";
-    readonly Upload: "upload";
 };
 export declare type TAction = typeof Action[keyof typeof Action];
 export declare type AppAbility = MongoAbility<[TAction, Subjects]>;

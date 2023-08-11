@@ -41,7 +41,6 @@ let UserController = class UserController {
         return users.map((user) => new auth_response_dto_1.AuthResponseDto(user));
     }
     async update(id, dto) {
-        console.log(dto);
         const user = await this.userService.updateOne({ id }, dto);
         if (!user)
             throw new common_1.NotFoundException(user_constants_1.USER_NOT_FOUND_ERROR);
@@ -61,9 +60,7 @@ let UserController = class UserController {
         if (!avatar)
             throw new common_1.NotFoundException(user_constants_1.AVATAR_NOT_FOUND_ERROR);
         const stream = (0, node_fs_1.createReadStream)(avatar.path);
-        res.set({
-            'Content-Type': avatar.mimetype,
-        });
+        res.set({ 'Content-Type': avatar.mimetype });
         return new common_1.StreamableFile(stream);
     }
     async removeAvatar(id) {
@@ -76,8 +73,8 @@ let UserController = class UserController {
     async getSolvedProblems(id) {
         return this.userService.getSolvedProblems(id);
     }
-    async getUserStatistics(id) {
-        return this.userService.getUserStatistics(id);
+    async getUserStatistics(userId) {
+        return this.userService.getUserStatistics(userId);
     }
     async findOne(id) {
         const user = await this.userService.findOne({ id });
@@ -107,6 +104,7 @@ __decorate([
 ], UserController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
+    (0, check_policies_decorator_1.CheckPolicies)(new policy_handler_1.PolicyHandler(casl_types_type_1.Action.Delete, user_entity_1.User)),
     (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
     openapi.ApiResponse({ status: common_1.HttpStatus.NO_CONTENT }),
     __param(0, (0, common_1.Param)('id')),
@@ -123,7 +121,6 @@ __decorate([
     (0, swagger_1.ApiBadRequestResponse)(),
     (0, swagger_1.ApiUnauthorizedResponse)(),
     (0, swagger_1.ApiForbiddenResponse)(),
-    (0, check_policies_decorator_1.CheckPolicies)(new policy_handler_1.PolicyHandler(casl_types_type_1.Action.Upload, user_entity_1.User)),
     openapi.ApiResponse({ status: common_1.HttpStatus.OK, type: require("./dto/avatar-response.dto").AvatarResponseDto }),
     __param(0, (0, common_1.UploadedFile)(new common_1.ParseFilePipeBuilder()
         .addMaxSizeValidator({ maxSize: Math.pow(1024, 2) * 5 })
@@ -137,10 +134,9 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "uploadAvatar", null);
 __decorate([
-    (0, common_1.Get)('avatar'),
-    (0, check_policies_decorator_1.CheckPolicies)(new policy_handler_1.PolicyHandler(casl_types_type_1.Action.ReadOne, user_entity_1.User)),
+    (0, common_1.Get)(':id/avatar'),
     openapi.ApiResponse({ status: 200 }),
-    __param(0, (0, get_current_userId_decorator_1.GetCurrentUserId)()),
+    __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Res)({ passthrough: true })),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Object]),
@@ -149,7 +145,6 @@ __decorate([
 __decorate([
     (0, common_1.Delete)('delete/avatar'),
     (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
-    (0, check_policies_decorator_1.CheckPolicies)(new policy_handler_1.PolicyHandler(casl_types_type_1.Action.Delete, user_entity_1.User)),
     openapi.ApiResponse({ status: common_1.HttpStatus.NO_CONTENT }),
     __param(0, (0, get_current_userId_decorator_1.GetCurrentUserId)()),
     __metadata("design:type", Function),
@@ -175,8 +170,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getSolvedProblems", null);
 __decorate([
-    (0, common_1.Get)('statistics/:id'),
-    openapi.ApiResponse({ status: 200, type: require("./dto/user-statistics.dto").UserStatistics }),
+    (0, common_1.Get)(':id/statistics'),
+    openapi.ApiResponse({ status: 200, type: require("./dto/user-statistics.dto").UserStatisticsDto }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),

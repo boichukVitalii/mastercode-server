@@ -14,23 +14,22 @@ import { Action, AppAbility, FlatComment, Subjects } from '../types/casl-types.t
 
 @Injectable()
 export class CaslAbilityFactory {
-	createForUser(user: TJwtPayload): AppAbility {
+	createForUser(user: TJwtPayload, paramsId?: string): AppAbility {
 		const { can, build } = new AbilityBuilder<AppAbility>(
 			createMongoAbility as CreateAbility<AppAbility>,
 		);
 
 		if (user.roles.includes('admin')) {
-			can(Action.ReadOne, 'all');
-			can(Action.ReadMany, 'all');
 			can(Action.Manage, [Problem, Category]);
-			can(Action.Create, Comment);
-		} else {
-			can([Action.ReadOne, Action.ReadMany], [Problem, Category, Comment, User]);
-			can(Action.Create, Comment);
 		}
 
+		if (paramsId && paramsId === user.sub) {
+			can([Action.Update, Action.Delete], User);
+		}
+
+		can([Action.ReadOne, Action.ReadMany], 'all');
+		can(Action.Create, Comment);
 		can<FlatComment>([Action.Update, Action.Delete], Comment, { 'user.id': user.sub });
-		can([Action.Update, Action.Upload, Action.Delete], User, { id: user.sub });
 
 		return build({
 			detectSubjectType: (item) => item.constructor as ExtractSubjectType<Subjects>,

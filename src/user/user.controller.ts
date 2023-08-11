@@ -45,7 +45,7 @@ import {
 import { AvatarResponseDto } from './dto/avatar-response.dto';
 import { AddSolvedProblemDto } from './dto/add-solved-problem.dto';
 import { UserSolvedProblem } from './entities/user-solved-problem.entity';
-import { UserStatistics } from './dto/user-statistics.dto';
+import { UserStatisticsDto } from './dto/user-statistics.dto';
 
 @ApiTags('user')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -54,7 +54,7 @@ export class UserController {
 	constructor(private readonly userService: UserService) {}
 
 	@Get()
-	@CheckPolicies(new PolicyHandler(Action.ReadMany, User))
+	@CheckPolicies(new PolicyHandler(Action.ReadMany, User)) // TODO ReadMany can only admin, fix this in factory
 	async findMany(@Query() query: UserQueryDto): Promise<AuthResponseDto[]> {
 		const users = await this.userService.findMany(query);
 		if (!users.length) throw new NotFoundException(USERS_NOT_FOUND_ERROR);
@@ -64,13 +64,13 @@ export class UserController {
 	@Patch(':id')
 	@CheckPolicies(new PolicyHandler(Action.Update, User))
 	async update(@Param('id') id: string, @Body() dto: UpdateUserDto): Promise<AuthResponseDto> {
-		console.log(dto);
 		const user = await this.userService.updateOne({ id }, dto);
 		if (!user) throw new NotFoundException(USER_NOT_FOUND_ERROR);
 		return new AuthResponseDto(user);
 	}
 
 	@Delete(':id')
+	@CheckPolicies(new PolicyHandler(Action.Delete, User))
 	@HttpCode(HttpStatus.NO_CONTENT)
 	async remove(@Param('id') id: string): Promise<void> {
 		const user = await this.userService.remove({ id });
@@ -85,7 +85,6 @@ export class UserController {
 	@ApiBadRequestResponse()
 	@ApiUnauthorizedResponse()
 	@ApiForbiddenResponse()
-	@CheckPolicies(new PolicyHandler(Action.Upload, User))
 	async uploadAvatar(
 		@UploadedFile(
 			new ParseFilePipeBuilder()
@@ -102,24 +101,20 @@ export class UserController {
 		return new AvatarResponseDto(avatar);
 	}
 
-	@Get('avatar')
-	@CheckPolicies(new PolicyHandler(Action.ReadOne, User))
+	@Get(':id/avatar')
 	async getUserAvatar(
-		@GetCurrentUserId() id: string,
+		@Param('id') id: string,
 		@Res({ passthrough: true }) res: Response,
 	): Promise<StreamableFile> {
 		const avatar = await this.userService.getUserAvatar(id);
 		if (!avatar) throw new NotFoundException(AVATAR_NOT_FOUND_ERROR);
 		const stream = createReadStream(avatar.path);
-		res.set({
-			'Content-Type': avatar.mimetype,
-		});
+		res.set({ 'Content-Type': avatar.mimetype });
 		return new StreamableFile(stream);
 	}
 
 	@Delete('delete/avatar')
 	@HttpCode(HttpStatus.NO_CONTENT)
-	@CheckPolicies(new PolicyHandler(Action.Delete, User))
 	async removeAvatar(@GetCurrentUserId() id: string): Promise<void> {
 		await this.userService.removeAvatar(id);
 	}
@@ -136,15 +131,13 @@ export class UserController {
 	}
 
 	@Get('solved-problems')
-	// @CheckPolicies(new PolicyHandler(Action.ReadMany, User))
 	async getSolvedProblems(@GetCurrentUserId() id: string): Promise<UserSolvedProblem[]> {
 		return this.userService.getSolvedProblems(id);
 	}
 
-	@Get('statistics/:id')
-	// @CheckPolicies(new PolicyHandler(Action.ReadMany, User))
-	async getUserStatistics(@Param('id') id: string): Promise<UserStatistics> {
-		return this.userService.getUserStatistics(id);
+	@Get(':id/statistics')
+	async getUserStatistics(@Param('id') userId: string): Promise<UserStatisticsDto> {
+		return this.userService.getUserStatistics(userId);
 	}
 
 	@Get(':id')

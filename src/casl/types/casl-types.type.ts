@@ -16,7 +16,6 @@ export const Action = {
 	ReadMany: 'read_many',
 	Update: 'update',
 	Delete: 'delete',
-	Upload: 'upload',
 } as const;
 
 export type TAction = typeof Action[keyof typeof Action];
@@ -31,5 +30,6 @@ export type Entity = Comment | User | Category | Problem;
 export interface IPolicyHandler {
 	action: TAction;
 	entity: ClassConstructor<Entity>;
+
 	handle(ability: AppAbility, id?: string): Promise<boolean>;
 }

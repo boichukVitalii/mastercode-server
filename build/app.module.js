@@ -37,7 +37,6 @@ const common_1 = require("@nestjs/common");
 const problem_module_1 = require("./problem/problem.module");
 const compiler_module_1 = require("./compiler/compiler.module");
 const typeorm_1 = require("@nestjs/typeorm");
-const config_1 = __importDefault(require("./config"));
 const user_module_1 = require("./user/user.module");
 const category_module_1 = require("./category/category.module");
 const comment_module_1 = require("./comment/comment.module");
@@ -53,6 +52,7 @@ const email_confirmation_guard_1 = require("./blocks/guards/email-confirmation.g
 const cache_manager_1 = require("@nestjs/cache-manager");
 const health_module_1 = require("./health/health.module");
 const redisStore = __importStar(require("cache-manager-redis-store"));
+const config_1 = __importDefault(require("./config"));
 let AppModule = class AppModule {
 };
 AppModule = __decorate([

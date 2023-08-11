@@ -1,8 +1,8 @@
 'use strict';
 
-const fs = require('fs');
-const perf_hooks = require('perf_hooks');
-const { join } = require('path');
+const fs = require('node:fs');
+const perf_hooks = require('node:perf_hooks');
+const { join } = require('node:path');
 
 const RESULT_FILE_PATH = join('result', 'result.txt');
 

@@ -8,6 +8,5 @@ exports.Action = {
     ReadMany: 'read_many',
     Update: 'update',
     Delete: 'delete',
-    Upload: 'upload',
 };
 //# sourceMappingURL=casl-types.type.js.map

@@ -13,7 +13,7 @@ import { Problem, ProblemDifficulty } from 'src/problem/entities/problem.entity'
 import { UserSolvedProblem } from './entities/user-solved-problem.entity';
 import { AddSolvedProblemDto } from './dto/add-solved-problem.dto';
 import { UserQueryDto } from './dto/user-query.dto';
-import { UserStatistics } from './dto/user-statistics.dto';
+import { UserStatisticsDto } from './dto/user-statistics.dto';
 
 @Injectable()
 export class UserService {
@@ -123,7 +123,7 @@ export class UserService {
 		});
 	}
 
-	async getUserStatistics(userId: string): Promise<UserStatistics> {
+	async getUserStatistics(userId: string): Promise<UserStatisticsDto> {
 		const solvedProblems = await this.getSolvedProblems(userId);
 		const numberOfSolvedProblems = solvedProblems.length;
 		const numberOfEasyProblems = await this.problemService.getNumberOfProblemsBy({

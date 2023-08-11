@@ -15,20 +15,17 @@ const category_entity_1 = require("../../category/entities/category.entity");
 const problem_entity_1 = require("../../problem/entities/problem.entity");
 const casl_types_type_1 = require("../types/casl-types.type");
 let CaslAbilityFactory = class CaslAbilityFactory {
-    createForUser(user) {
+    createForUser(user, paramsId) {
         const { can, build } = new ability_1.AbilityBuilder(ability_1.createMongoAbility);
         if (user.roles.includes('admin')) {
-            can(casl_types_type_1.Action.ReadOne, 'all');
-            can(casl_types_type_1.Action.ReadMany, 'all');
             can(casl_types_type_1.Action.Manage, [problem_entity_1.Problem, category_entity_1.Category]);
-            can(casl_types_type_1.Action.Create, comment_entity_1.Comment);
         }
-        else {
-            can([casl_types_type_1.Action.ReadOne, casl_types_type_1.Action.ReadMany], [problem_entity_1.Problem, category_entity_1.Category, comment_entity_1.Comment, user_entity_1.User]);
-            can(casl_types_type_1.Action.Create, comment_entity_1.Comment);
+        if (paramsId && paramsId === user.sub) {
+            can([casl_types_type_1.Action.Update, casl_types_type_1.Action.Delete], user_entity_1.User);
         }
+        can([casl_types_type_1.Action.ReadOne, casl_types_type_1.Action.ReadMany], 'all');
+        can(casl_types_type_1.Action.Create, comment_entity_1.Comment);
         can([casl_types_type_1.Action.Update, casl_types_type_1.Action.Delete], comment_entity_1.Comment, { 'user.id': user.sub });
-        can([casl_types_type_1.Action.Update, casl_types_type_1.Action.Upload, casl_types_type_1.Action.Delete], user_entity_1.User, { id: user.sub });
         return build({
             detectSubjectType: (item) => item.constructor,
         });

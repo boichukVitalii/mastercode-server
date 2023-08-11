@@ -7,7 +7,7 @@ import { ProblemService } from 'src/problem/problem.service';
 import { UserSolvedProblem } from './entities/user-solved-problem.entity';
 import { AddSolvedProblemDto } from './dto/add-solved-problem.dto';
 import { UserQueryDto } from './dto/user-query.dto';
-import { UserStatistics } from './dto/user-statistics.dto';
+import { UserStatisticsDto } from './dto/user-statistics.dto';
 export declare class UserService {
     private readonly userRepository;
     private readonly userSolvedProblemRepository;
@@ -27,5 +27,5 @@ export declare class UserService {
     removeAvatar(userId: string): Promise<void>;
     addSolvedProblem(data: AddSolvedProblemDto): Promise<void>;
     getSolvedProblems(userId: string): Promise<UserSolvedProblem[]>;
-    getUserStatistics(userId: string): Promise<UserStatistics>;
+    getUserStatistics(userId: string): Promise<UserStatisticsDto>;
 }

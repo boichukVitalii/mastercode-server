@@ -10,7 +10,7 @@ export declare class CommentController {
     private readonly problemService;
     private readonly userService;
     constructor(commentService: CommentService, problemService: ProblemService, userService: UserService);
-    create(dto: CreateCommentDto, user_id: string): Promise<Comment>;
+    create(dto: CreateCommentDto, userId: string): Promise<Comment>;
     findMany(query: CommentQueryDto): Promise<Comment[]>;
     findOne(id: string): Promise<Comment>;
     update(id: string, dto: UpdateCommentDto): Promise<Comment>;

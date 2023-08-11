@@ -9,6 +9,7 @@ import { EmailModule } from 'src/email/email.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PasswordResetToken } from './entities/password-reset-token.entity';
 import { GoogleAuthService } from './social/google-authentication.service';
+import { HashingService } from './hashing/hashing.service';
 
 @Module({
 	imports: [
@@ -19,6 +20,6 @@ import { GoogleAuthService } from './social/google-authentication.service';
 		TypeOrmModule.forFeature([PasswordResetToken]),
 	],
 	controllers: [AuthController],
-	providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy, GoogleAuthService],
+	providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy, GoogleAuthService, HashingService],
 })
 export class AuthModule {}

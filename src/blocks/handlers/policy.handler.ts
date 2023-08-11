@@ -9,19 +9,12 @@ import {
 import config from 'src/config';
 
 export class PolicyHandler implements IPolicyHandler {
-	readonly action: TAction;
-	readonly entity: ClassConstructor<Entity>;
-
-	constructor(action: TAction, entity: ClassConstructor<Entity>) {
-		this.action = action;
-		this.entity = entity;
-	}
+	constructor(public readonly action: TAction, public readonly entity: ClassConstructor<Entity>) {}
 
 	async handle(ability: AppAbility, id?: string): Promise<boolean> {
 		if (!id) return ability.can(this.action, this.entity as Subjects);
 		const dataSource = await config.dataSourceInit;
 		const record = await dataSource.getRepository(this.entity).findOneByOrFail({ id });
-		console.log('Record', record);
 		return ability.can(this.action, record);
 	}
 }
