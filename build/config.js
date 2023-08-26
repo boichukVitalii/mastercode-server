@@ -25,7 +25,11 @@ const dbConfig = {
 };
 const redisCacheConfig = {
     host: process.env.REDIS_HOST,
-    port: parseInt(process.env.REDIS_PORT, 10),
+    port: parseInt(process.env.REDIS_CACHE_PORT, 10),
+};
+const redisQueueConfig = {
+    host: process.env.REDIS_HOST,
+    port: parseInt(process.env.REDIS_QUEUE_PORT, 10),
 };
 const uploadsPath = (0, node_path_1.join)(process.cwd(), 'uploads');
 exports.dataSource = new typeorm_1.DataSource(dbConfig);
@@ -34,6 +38,7 @@ exports.default = {
     env: process.env.ENV_NAME,
     dbConfig,
     redisCacheConfig,
+    redisQueueConfig,
     dataSourceInit: exports.dataSource.initialize(),
     accessSecret: process.env.JWT_ACCESS_SECRET,
     refreshSecret: process.env.JWT_REFRESH_SECRET,

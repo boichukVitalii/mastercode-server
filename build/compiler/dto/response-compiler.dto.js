@@ -3,19 +3,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ResponseCompilerDto = exports.Verdict = void 0;
 const openapi = require("@nestjs/swagger");
 exports.Verdict = {
-    Accepted: 'Accepted',
     Correct: 'Correct',
     WrongAnswer: 'Wrong answer',
+    Timeout: 'Timeout',
     Error: 'Error',
 };
 class ResponseCompilerDto {
-    constructor(verdict, logs, runTime) {
+    constructor(verdict, info, logs, runTime) {
         this.verdict = verdict;
+        this.info = info;
         this.logs = logs;
         this.runTime = runTime;
     }
     static _OPENAPI_METADATA_FACTORY() {
-        return { verdict: { required: true, type: () => Object }, logs: { required: true, type: () => String }, runTime: { required: false, type: () => String } };
+        return {};
     }
 }
 exports.ResponseCompilerDto = ResponseCompilerDto;

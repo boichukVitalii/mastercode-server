@@ -6,13 +6,15 @@ import { DataSource, Repository } from 'typeorm';
 import { TAuthResponse, TJwtPayload, TTokens } from './types';
 import { EmailService } from 'src/email/email.service';
 import { PasswordResetToken } from './entities/password-reset-token.entity';
+import { HashingService } from './hashing/hashing.service';
 export declare class AuthService {
     private readonly userService;
     private readonly jwtService;
     private readonly emailService;
+    private readonly hashingService;
     private readonly dataSource;
     private readonly passwordResetTokenRepository;
-    constructor(userService: UserService, jwtService: JwtService, emailService: EmailService, dataSource: DataSource, passwordResetTokenRepository: Repository<PasswordResetToken>);
+    constructor(userService: UserService, jwtService: JwtService, emailService: EmailService, hashingService: HashingService, dataSource: DataSource, passwordResetTokenRepository: Repository<PasswordResetToken>);
     signupLocal(dto: SignupLocalDto): Promise<TAuthResponse>;
     signinLocal(dto: SigninLocalDto): Promise<TAuthResponse>;
     logout(userId: string): Promise<void>;
@@ -20,6 +22,5 @@ export declare class AuthService {
     generatePasswordResetToken(email: string): Promise<void>;
     resetPassword(passwordResetToken: string, newPassword: string): Promise<void>;
     private updateRefreshTokenHash;
-    private hashData;
     getTokens(payload: TJwtPayload): Promise<TTokens>;
 }

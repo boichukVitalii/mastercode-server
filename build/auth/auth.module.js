@@ -18,6 +18,8 @@ const email_module_1 = require("../email/email.module");
 const typeorm_1 = require("@nestjs/typeorm");
 const password_reset_token_entity_1 = require("./entities/password-reset-token.entity");
 const google_authentication_service_1 = require("./social/google-authentication.service");
+const hashing_service_1 = require("./hashing/hashing.service");
+const bcrypt_service_1 = require("./hashing/bcrypt.service");
 let AuthModule = class AuthModule {
 };
 AuthModule = __decorate([
@@ -30,7 +32,16 @@ AuthModule = __decorate([
             typeorm_1.TypeOrmModule.forFeature([password_reset_token_entity_1.PasswordResetToken]),
         ],
         controllers: [auth_controller_1.AuthController],
-        providers: [auth_service_1.AuthService, strategies_1.AccessTokenStrategy, strategies_1.RefreshTokenStrategy, google_authentication_service_1.GoogleAuthService],
+        providers: [
+            auth_service_1.AuthService,
+            strategies_1.AccessTokenStrategy,
+            strategies_1.RefreshTokenStrategy,
+            google_authentication_service_1.GoogleAuthService,
+            {
+                provide: hashing_service_1.HashingService,
+                useClass: bcrypt_service_1.BcryptService,
+            },
+        ],
     })
 ], AuthModule);
 exports.AuthModule = AuthModule;

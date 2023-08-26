@@ -66,7 +66,7 @@ let FileService = class FileService {
         return filesData;
     }
     async getFileById(id) {
-        return this.fileRepository.findOneBy({ id });
+        return await this.fileRepository.findOneBy({ id });
     }
     async removeFile(id) {
         const file = await this.getFileById(id);
@@ -84,12 +84,12 @@ let FileService = class FileService {
         await fs.promises.rm(file.path);
         return deletedFile;
     }
+    async convertToWebP(fileBuffer) {
+        return await (0, sharp_1.default)(fileBuffer).webp().toBuffer();
+    }
     async saveFileDataToDB(fileInfo) {
         const newFile = this.fileRepository.create(fileInfo);
-        return this.fileRepository.save(newFile);
-    }
-    async convertToWebP(fileBuffer) {
-        return (0, sharp_1.default)(fileBuffer).webp().toBuffer();
+        return await this.fileRepository.save(newFile);
     }
 };
 FileService = __decorate([

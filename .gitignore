@@ -39,5 +39,5 @@ lerna-debug.log*
 /.env
 
 # else
-/uploads
+/uploads/avatars
 /migrations

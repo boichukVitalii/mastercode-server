@@ -28,7 +28,13 @@ const dbConfig: PostgresConnectionOptions = {
 const redisCacheConfig = {
 	host: process.env.REDIS_HOST,
 	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-	port: parseInt(process.env.REDIS_PORT!, 10),
+	port: parseInt(process.env.REDIS_CACHE_PORT!, 10),
+};
+
+const redisQueueConfig = {
+	host: process.env.REDIS_HOST,
+	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+	port: parseInt(process.env.REDIS_QUEUE_PORT!, 10),
 };
 
 const uploadsPath = join(process.cwd(), 'uploads');
@@ -39,6 +45,7 @@ export default {
 	env: process.env.ENV_NAME,
 	dbConfig,
 	redisCacheConfig,
+	redisQueueConfig,
 	dataSourceInit: dataSource.initialize(),
 	accessSecret: process.env.JWT_ACCESS_SECRET,
 	refreshSecret: process.env.JWT_REFRESH_SECRET,

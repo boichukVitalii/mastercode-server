@@ -24,11 +24,20 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Compiler = void 0;
+const user_solved_problem_entity_1 = require("../user/entities/user-solved-problem.entity");
 const response_compiler_dto_1 = require("./dto/response-compiler.dto");
 const fsp = __importStar(require("node:fs/promises"));
 const node_crypto_1 = require("node:crypto");
 const node_path_1 = require("node:path");
 const node_child_process_1 = require("node:child_process");
+const node_timers_1 = require("node:timers");
+const TIMEOUT_ERROR_STRING = 'Timeout';
+const TIMEOUT_TIME_MS = 35000;
+const commonErrorPattern = 'Error: ';
+const langSpecificErrorPattern = new Map([
+    [user_solved_problem_entity_1.Language.JS, 'ReferenceError'],
+    [user_solved_problem_entity_1.Language.PYTHON, 'NameError'],
+]);
 class Compiler {
     constructor(code, lang, problem) {
         this.code = code;
@@ -64,7 +73,7 @@ class Compiler {
     }
     async compile() {
         await this.prepareEnv();
-        return new Promise((resolve, reject) => {
+        return await new Promise((resolve, reject) => {
             const logData = [];
             const errData = [];
             const dockerBuild = (0, node_child_process_1.spawn)('docker', [
@@ -82,24 +91,31 @@ class Compiler {
                     `${this.solutionResultDirInHostFS}:${this.solutionResultDirInDocker}`,
                     this.imageName,
                 ]);
+                const timeout = (0, node_timers_1.setTimeout)(() => {
+                    dockerRun.kill('SIGKILL');
+                    errData.push(Buffer.from(TIMEOUT_ERROR_STRING));
+                }, TIMEOUT_TIME_MS);
                 dockerRun.stdout.on('data', (chunk) => logData.push(chunk));
                 dockerRun.on('exit', async () => {
+                    (0, node_timers_1.clearTimeout)(timeout);
                     if (errData.length) {
-                        const logs = Buffer.concat(errData).toString();
-                        const modifiedLogs = logs
-                            .split('\n')
-                            .filter((s) => !s.includes('at'))
-                            .join()
-                            .replace(/  +/g, ' ');
-                        this.result = new response_compiler_dto_1.ResponseCompilerDto(response_compiler_dto_1.Verdict.Error, modifiedLogs);
+                        const logs = Buffer.concat(logData).toString();
+                        const info = Buffer.concat(errData).toString();
+                        const isTimeoutError = info === TIMEOUT_ERROR_STRING;
+                        const verdict = isTimeoutError ? response_compiler_dto_1.Verdict.Timeout : response_compiler_dto_1.Verdict.Error;
+                        const modifiedInfo = isTimeoutError
+                            ? undefined
+                            : info
+                                .split('\n')
+                                .filter((s) => s.includes(commonErrorPattern))
+                                .join();
+                        this.result = new response_compiler_dto_1.ResponseCompilerDto(verdict, modifiedInfo, logs);
                     }
                     else {
                         const logs = Buffer.concat(logData).toString();
-                        const [resultData, runTime] = (await fsp.readFile(this.solutionResultFileInHostFS, 'utf-8')).split('\n');
-                        const verdict = resultData.includes(response_compiler_dto_1.Verdict.Accepted)
-                            ? response_compiler_dto_1.Verdict.Accepted
-                            : response_compiler_dto_1.Verdict.WrongAnswer;
-                        this.result = new response_compiler_dto_1.ResponseCompilerDto(verdict, logs, runTime);
+                        const [executorVerdict, info, runTime] = (await fsp.readFile(this.solutionResultFileInHostFS, 'utf-8')).split('\n');
+                        const verdict = executorVerdict === 'Correct' ? response_compiler_dto_1.Verdict.Correct : response_compiler_dto_1.Verdict.WrongAnswer;
+                        this.result = new response_compiler_dto_1.ResponseCompilerDto(verdict, info, logs, parseFloat(runTime));
                     }
                     resolve(this.result);
                     const rmDocContainer = (0, node_child_process_1.spawn)('docker', ['rm', this.containerName]);

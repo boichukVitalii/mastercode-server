@@ -9,6 +9,10 @@ declare const _default: {
         host: string | undefined;
         port: number;
     };
+    redisQueueConfig: {
+        host: string | undefined;
+        port: number;
+    };
     dataSourceInit: Promise<DataSource>;
     accessSecret: string | undefined;
     refreshSecret: string | undefined;

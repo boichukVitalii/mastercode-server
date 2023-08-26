@@ -9,6 +9,6 @@ export declare class FileService {
     getFileById(id: string): Promise<File | null>;
     removeFile(id: string): Promise<File | null>;
     removeFileWithQueryRunner(id: string, queryRunner: QueryRunner): Promise<File | null>;
-    private saveFileDataToDB;
     convertToWebP(fileBuffer: Buffer): Promise<Buffer>;
+    private saveFileDataToDB;
 }

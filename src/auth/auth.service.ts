@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { SignupLocalDto } from './dto/signup-local.dto';
-import * as bcrypt from 'bcrypt';
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { SigninLocalDto } from './dto/signin-local.dto';
@@ -20,6 +19,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PasswordResetToken } from './entities/password-reset-token.entity';
 import { passwordResetHTML } from 'src/assets/html';
 import { INVALID_RESET_TOKEN_ERROR, TOKEN_HAS_EXPIRED_ERROR } from './auth.constants';
+import { HashingService } from './hashing/hashing.service';
 
 @Injectable()
 export class AuthService {
@@ -27,13 +27,14 @@ export class AuthService {
 		private readonly userService: UserService,
 		private readonly jwtService: JwtService,
 		private readonly emailService: EmailService,
+		private readonly hashingService: HashingService,
 		private readonly dataSource: DataSource,
 		@InjectRepository(PasswordResetToken)
 		private readonly passwordResetTokenRepository: Repository<PasswordResetToken>,
 	) {}
 
 	async signupLocal(dto: SignupLocalDto): Promise<TAuthResponse> {
-		const password_hash = await this.hashData(dto.password);
+		const password_hash = await this.hashingService.hash(dto.password);
 		const user = await this.userService.create({ ...dto, password_hash });
 		const tokens = await this.getTokens({
 			sub: user.id,
@@ -48,7 +49,7 @@ export class AuthService {
 	async signinLocal(dto: SigninLocalDto): Promise<TAuthResponse> {
 		const user = await this.userService.findOne({ email: dto.email });
 		if (!user || !user.password_hash) throw new WrongCredentialsError();
-		const passwordMatches = await bcrypt.compare(dto.password, user.password_hash);
+		const passwordMatches = await this.hashingService.compare(dto.password, user.password_hash);
 		if (!passwordMatches) throw new WrongCredentialsError();
 		if (!user.is_email_confirmed) throw new EmailNotConfirmedError();
 		const tokens = await this.getTokens({
@@ -72,7 +73,10 @@ export class AuthService {
 		const user = await this.userService.findOne({ id: userId });
 		if (!user || !user.refresh_token_hash) throw new WrongCredentialsError();
 
-		const refreshTokenMatches = await bcrypt.compare(refreshToken, user.refresh_token_hash);
+		const refreshTokenMatches = await this.hashingService.compare(
+			refreshToken,
+			user.refresh_token_hash,
+		);
 		if (!refreshTokenMatches) throw new WrongCredentialsError();
 
 		const tokens = await this.getTokens({
@@ -138,7 +142,7 @@ export class AuthService {
 				throw new InvalidTokenError(TOKEN_HAS_EXPIRED_ERROR);
 			}
 
-			const password_hash = await this.hashData(newPassword);
+			const password_hash = await this.hashingService.hash(newPassword);
 			await queryRunner.manager.update(User, { id: userId }, { password_hash });
 
 			await queryRunner.commitTransaction();
@@ -151,13 +155,8 @@ export class AuthService {
 	}
 
 	private async updateRefreshTokenHash(userId: string, refreshToken: string): Promise<void> {
-		const refresh_token_hash = await this.hashData(refreshToken);
+		const refresh_token_hash = await this.hashingService.hash(refreshToken);
 		await this.userService.updateOne({ id: userId }, { refresh_token_hash });
-	}
-
-	private async hashData(data: string): Promise<string> {
-		const saltRounds = 10;
-		return bcrypt.hash(data, saltRounds);
 	}
 
 	async getTokens(payload: TJwtPayload): Promise<TTokens> {

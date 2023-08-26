@@ -132,12 +132,12 @@ export class UserController {
 
 	@Get('solved-problems')
 	async getSolvedProblems(@GetCurrentUserId() id: string): Promise<UserSolvedProblem[]> {
-		return this.userService.getSolvedProblems(id);
+		return await this.userService.getSolvedProblems(id);
 	}
 
 	@Get(':id/statistics')
 	async getUserStatistics(@Param('id') userId: string): Promise<UserStatisticsDto> {
-		return this.userService.getUserStatistics(userId);
+		return await this.userService.getUserStatistics(userId);
 	}
 
 	@Get(':id')

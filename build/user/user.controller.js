@@ -71,10 +71,10 @@ let UserController = class UserController {
         await this.userService.addSolvedProblem({ ...dto });
     }
     async getSolvedProblems(id) {
-        return this.userService.getSolvedProblems(id);
+        return await this.userService.getSolvedProblems(id);
     }
     async getUserStatistics(userId) {
-        return this.userService.getUserStatistics(userId);
+        return await this.userService.getUserStatistics(userId);
     }
     async findOne(id) {
         const user = await this.userService.findOne({ id });

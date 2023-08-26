@@ -1,32 +1,9 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
 };
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
@@ -40,7 +17,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
-const bcrypt = __importStar(require("bcrypt"));
 const user_service_1 = require("../user/user.service");
 const jwt_1 = require("@nestjs/jwt");
 const typeorm_1 = require("typeorm");
@@ -54,16 +30,18 @@ const typeorm_2 = require("@nestjs/typeorm");
 const password_reset_token_entity_1 = require("./entities/password-reset-token.entity");
 const html_1 = require("../assets/html");
 const auth_constants_1 = require("./auth.constants");
+const hashing_service_1 = require("./hashing/hashing.service");
 let AuthService = class AuthService {
-    constructor(userService, jwtService, emailService, dataSource, passwordResetTokenRepository) {
+    constructor(userService, jwtService, emailService, hashingService, dataSource, passwordResetTokenRepository) {
         this.userService = userService;
         this.jwtService = jwtService;
         this.emailService = emailService;
+        this.hashingService = hashingService;
         this.dataSource = dataSource;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
     async signupLocal(dto) {
-        const password_hash = await this.hashData(dto.password);
+        const password_hash = await this.hashingService.hash(dto.password);
         const user = await this.userService.create({ ...dto, password_hash });
         const tokens = await this.getTokens({
             sub: user.id,
@@ -78,7 +56,7 @@ let AuthService = class AuthService {
         const user = await this.userService.findOne({ email: dto.email });
         if (!user || !user.password_hash)
             throw new custom_errors_1.WrongCredentialsError();
-        const passwordMatches = await bcrypt.compare(dto.password, user.password_hash);
+        const passwordMatches = await this.hashingService.compare(dto.password, user.password_hash);
         if (!passwordMatches)
             throw new custom_errors_1.WrongCredentialsError();
         if (!user.is_email_confirmed)
@@ -99,7 +77,7 @@ let AuthService = class AuthService {
         const user = await this.userService.findOne({ id: userId });
         if (!user || !user.refresh_token_hash)
             throw new custom_errors_1.WrongCredentialsError();
-        const refreshTokenMatches = await bcrypt.compare(refreshToken, user.refresh_token_hash);
+        const refreshTokenMatches = await this.hashingService.compare(refreshToken, user.refresh_token_hash);
         if (!refreshTokenMatches)
             throw new custom_errors_1.WrongCredentialsError();
         const tokens = await this.getTokens({
@@ -156,7 +134,7 @@ let AuthService = class AuthService {
             if (matchedRow.token_expiry < Date.now()) {
                 throw new custom_errors_1.InvalidTokenError(auth_constants_1.TOKEN_HAS_EXPIRED_ERROR);
             }
-            const password_hash = await this.hashData(newPassword);
+            const password_hash = await this.hashingService.hash(newPassword);
             await queryRunner.manager.update(user_entity_1.User, { id: userId }, { password_hash });
             await queryRunner.commitTransaction();
         }
@@ -169,12 +147,8 @@ let AuthService = class AuthService {
         }
     }
     async updateRefreshTokenHash(userId, refreshToken) {
-        const refresh_token_hash = await this.hashData(refreshToken);
+        const refresh_token_hash = await this.hashingService.hash(refreshToken);
         await this.userService.updateOne({ id: userId }, { refresh_token_hash });
-    }
-    async hashData(data) {
-        const saltRounds = 10;
-        return bcrypt.hash(data, saltRounds);
     }
     async getTokens(payload) {
         const [accessToken, refreshToken] = await Promise.all([
@@ -192,10 +166,11 @@ let AuthService = class AuthService {
 };
 AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __param(4, (0, typeorm_2.InjectRepository)(password_reset_token_entity_1.PasswordResetToken)),
+    __param(5, (0, typeorm_2.InjectRepository)(password_reset_token_entity_1.PasswordResetToken)),
     __metadata("design:paramtypes", [user_service_1.UserService,
         jwt_1.JwtService,
         email_service_1.EmailService,
+        hashing_service_1.HashingService,
         typeorm_1.DataSource,
         typeorm_1.Repository])
 ], AuthService);

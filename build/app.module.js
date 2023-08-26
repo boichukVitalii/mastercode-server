@@ -51,6 +51,7 @@ const policies_guard_1 = require("./blocks/guards/policies.guard");
 const email_confirmation_guard_1 = require("./blocks/guards/email-confirmation.guard");
 const cache_manager_1 = require("@nestjs/cache-manager");
 const health_module_1 = require("./health/health.module");
+const bull_1 = require("@nestjs/bull");
 const redisStore = __importStar(require("cache-manager-redis-store"));
 const config_1 = __importDefault(require("./config"));
 let AppModule = class AppModule {
@@ -66,6 +67,12 @@ AppModule = __decorate([
                 store: redisStore,
                 socket: config_1.default.redisCacheConfig,
                 ttl: 5000,
+            }),
+            bull_1.BullModule.forRoot({
+                redis: {
+                    host: config_1.default.redisQueueConfig.host,
+                    port: config_1.default.redisQueueConfig.port,
+                },
             }),
             problem_module_1.ProblemModule,
             compiler_module_1.CompilerModule,

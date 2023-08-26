@@ -16,6 +16,7 @@ import { PoliciesGuard } from './blocks/guards/policies.guard';
 import { EmailConfirmationGuard } from './blocks/guards/email-confirmation.guard';
 import { CacheModule } from '@nestjs/cache-manager';
 import { HealthModule } from './health/health.module';
+import { BullModule } from '@nestjs/bull';
 
 import * as redisStore from 'cache-manager-redis-store';
 import config from './config';
@@ -33,6 +34,12 @@ import config from './config';
 			store: redisStore,
 			socket: config.redisCacheConfig,
 			ttl: 5000,
+		}),
+		BullModule.forRoot({
+			redis: {
+				host: config.redisQueueConfig.host,
+				port: config.redisQueueConfig.port,
+			},
 		}),
 		ProblemModule,
 		CompilerModule,

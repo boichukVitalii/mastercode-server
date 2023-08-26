@@ -20,15 +20,13 @@ def validate(inputs, outputs):
         result = solver(inval[i])
         end_time = perf_counter_ns()
         time_in_ms = (end_time - start_time) / 1000000.0
-        if str([result]) != str(outval[i]):  # true != [true]
-            print(str(result))
-            print(str(outval[i]))
-            data = f"Wrong answer - Input: {inval[i]} | Expected output: {outval[i]}\n{time_in_ms}"
+        if str([result]) != str(outval[i]):
+            data = f"Incorrect\nInput: {inval[i]} | Expected output: {outval[i]}\n{time_in_ms}"
             with open(RESULT_FILE_PATH, 'w') as f:
                 f.write(data)
             return
     with open(RESULT_FILE_PATH, 'w') as f:
-        f.write(f"Accepted\n{time_in_ms}")
+        f.write(f"Correct\n\n{time_in_ms}")
     return
 
 

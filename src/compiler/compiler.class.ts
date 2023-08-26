@@ -1,5 +1,5 @@
 import { Problem } from 'src/problem/entities/problem.entity';
-import { TLanguage } from 'src/user/entities/user-solved-problem.entity';
+import { Language, TLanguage } from 'src/user/entities/user-solved-problem.entity';
 import { ResponseCompilerDto, Verdict } from './dto/response-compiler.dto';
 import { CodeType } from './dto/compiler.dto';
 
@@ -7,6 +7,19 @@ import * as fsp from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { join } from 'node:path';
 import { spawn } from 'node:child_process';
+import { setTimeout, clearTimeout } from 'node:timers';
+
+const TIMEOUT_ERROR_STRING = 'Timeout';
+const TIMEOUT_TIME_MS = 35000;
+
+type TExecutorVerdict = 'Correct' | 'Incorrect';
+type TExecutorResult = [TExecutorVerdict, string, string];
+
+const commonErrorPattern = 'Error: ';
+const langSpecificErrorPattern = new Map([
+	[Language.JS, 'ReferenceError'],
+	[Language.PYTHON, 'NameError'],
+]);
 
 export class Compiler {
 	private readonly code: CodeType;
@@ -75,8 +88,8 @@ export class Compiler {
 
 	public async compile(): Promise<ResponseCompilerDto> {
 		await this.prepareEnv();
-		return new Promise((resolve, reject) => {
-			const logData: Buffer[] = []; // currently unused in response
+		return await new Promise((resolve, reject) => {
+			const logData: Buffer[] = [];
 			const errData: Buffer[] = [];
 
 			const dockerBuild = spawn('docker', [
@@ -96,26 +109,35 @@ export class Compiler {
 					this.imageName,
 				]);
 
+				const timeout = setTimeout(() => {
+					dockerRun.kill('SIGKILL');
+					errData.push(Buffer.from(TIMEOUT_ERROR_STRING));
+				}, TIMEOUT_TIME_MS);
+
 				dockerRun.stdout.on('data', (chunk) => logData.push(chunk));
 
 				dockerRun.on('exit', async () => {
+					clearTimeout(timeout);
+
 					if (errData.length) {
-						const logs = Buffer.concat(errData).toString();
-						const modifiedLogs = logs
-							.split('\n')
-							.filter((s) => !s.includes('at'))
-							.join()
-							.replace(/  +/g, ' ');
-						this.result = new ResponseCompilerDto(Verdict.Error, modifiedLogs);
+						const logs = Buffer.concat(logData).toString();
+						const info = Buffer.concat(errData).toString();
+						const isTimeoutError = info === TIMEOUT_ERROR_STRING;
+						const verdict = isTimeoutError ? Verdict.Timeout : Verdict.Error;
+						const modifiedInfo = isTimeoutError
+							? undefined
+							: info
+									.split('\n')
+									.filter((s) => s.includes(commonErrorPattern))
+									.join();
+						this.result = new ResponseCompilerDto(verdict, modifiedInfo, logs);
 					} else {
 						const logs = Buffer.concat(logData).toString();
-						const [resultData, runTime] = (
+						const [executorVerdict, info, runTime] = (
 							await fsp.readFile(this.solutionResultFileInHostFS, 'utf-8')
-						).split('\n');
-						const verdict = resultData.includes(Verdict.Accepted)
-							? Verdict.Accepted
-							: Verdict.WrongAnswer;
-						this.result = new ResponseCompilerDto(verdict, logs, runTime);
+						).split('\n') as TExecutorResult;
+						const verdict = executorVerdict === 'Correct' ? Verdict.Correct : Verdict.WrongAnswer;
+						this.result = new ResponseCompilerDto(verdict, info, logs, parseFloat(runTime));
 					}
 					resolve(this.result);
 

@@ -29,7 +29,7 @@ export class FileService {
 	}
 
 	async getFileById(id: string): Promise<File | null> {
-		return this.fileRepository.findOneBy({ id });
+		return await this.fileRepository.findOneBy({ id });
 	}
 
 	async removeFile(id: string): Promise<File | null> {
@@ -48,12 +48,12 @@ export class FileService {
 		return deletedFile;
 	}
 
-	private async saveFileDataToDB(fileInfo: FileDto): Promise<File> {
-		const newFile = this.fileRepository.create(fileInfo);
-		return this.fileRepository.save(newFile);
+	async convertToWebP(fileBuffer: Buffer): Promise<Buffer> {
+		return await sharp(fileBuffer).webp().toBuffer();
 	}
 
-	async convertToWebP(fileBuffer: Buffer): Promise<Buffer> {
-		return sharp(fileBuffer).webp().toBuffer();
+	private async saveFileDataToDB(fileInfo: FileDto): Promise<File> {
+		const newFile = this.fileRepository.create(fileInfo);
+		return await this.fileRepository.save(newFile);
 	}
 }
