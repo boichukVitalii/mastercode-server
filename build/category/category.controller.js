@@ -30,7 +30,7 @@ let CategoryController = class CategoryController {
         this.categoryService = categoryService;
     }
     async create(dto) {
-        return this.categoryService.create(dto);
+        return await this.categoryService.create(dto);
     }
     async findMany(query) {
         const categories = await this.categoryService.findMany(query);
@@ -39,16 +39,13 @@ let CategoryController = class CategoryController {
         return categories;
     }
     async findOne(id) {
-        const category = await this.categoryService.findOneOrThrow({ id });
-        return category;
+        return await this.categoryService.findOneOrThrow({ id });
     }
     async update(id, dto) {
-        const category = await this.categoryService.updateOne({ id }, dto);
-        return category;
+        return await this.categoryService.updateOne({ id }, dto);
     }
     async remove(id) {
-        const category = await this.categoryService.remove({ id });
-        return category;
+        return await this.categoryService.remove({ id });
     }
 };
 __decorate([

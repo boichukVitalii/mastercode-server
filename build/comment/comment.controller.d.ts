@@ -1,9 +1,9 @@
-import { ProblemService } from 'src/problem/problem.service';
+import { ProblemService } from '../problem/problem.service';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Comment } from './entities/comment.entity';
-import { UserService } from 'src/user/user.service';
+import { UserService } from '../user/user.service';
 import { CommentQueryDto } from './dto/comment-query.dto';
 export declare class CommentController {
     private readonly commentService;

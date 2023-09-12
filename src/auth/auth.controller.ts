@@ -9,11 +9,11 @@ import {
 	UseInterceptors,
 	BadRequestException,
 } from '@nestjs/common';
-import { GetCurrentUser } from 'src/blocks/decorators/get-current-user.decorator';
-import { GetCurrentUserId } from 'src/blocks/decorators/get-current-userId.decorator';
-import { Public } from 'src/blocks/decorators/public.decorator';
-import { RefreshTokenGuard } from 'src/blocks/guards/refresh-token.guard';
-import { EmailConfirmationService } from 'src/email-confirmation/email-confirmation.service';
+import { GetCurrentUser } from '../blocks/decorators/get-current-user.decorator';
+import { GetCurrentUserId } from '../blocks/decorators/get-current-userId.decorator';
+import { Public } from '../blocks/decorators/public.decorator';
+import { RefreshTokenGuard } from '../blocks/guards/refresh-token.guard';
+import { EmailConfirmationService } from '../email-confirmation/email-confirmation.service';
 import { AuthService } from './auth.service';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { SigninLocalDto } from './dto/signin-local.dto';
@@ -65,7 +65,7 @@ export class AuthController {
 	@Public()
 	@Post('social/google')
 	async auth(@Body() dto: GoogleTokenDto): Promise<TAuthResponse> {
-		return this.googleAuthService.authenticate(dto.token);
+		return await this.googleAuthService.authenticate(dto.token);
 	}
 
 	@Post('logout')
@@ -82,7 +82,7 @@ export class AuthController {
 		@GetCurrentUserId() userId: string,
 		@GetCurrentUser('refreshToken') refreshToken: string,
 	): Promise<TTokens> {
-		return this.authService.refreshTokens(userId, refreshToken);
+		return await this.authService.refreshTokens(userId, refreshToken);
 	}
 
 	@Public()

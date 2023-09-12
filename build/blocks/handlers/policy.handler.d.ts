@@ -1,5 +1,5 @@
 import { ClassConstructor } from 'class-transformer';
-import { AppAbility, Entity, IPolicyHandler, TAction } from 'src/casl/types/casl-types.type';
+import { AppAbility, Entity, IPolicyHandler, TAction } from '../../casl/types/casl-types.type';
 export declare class PolicyHandler implements IPolicyHandler {
     readonly action: TAction;
     readonly entity: ClassConstructor<Entity>;

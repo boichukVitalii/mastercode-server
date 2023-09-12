@@ -10,7 +10,7 @@ import type { Level } from 'pino';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
-import logger, { setTraceId } from 'src/logger';
+import logger, { setTraceId } from '../../logger';
 
 export class RestLoggingInterceptor implements NestInterceptor {
 	intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {

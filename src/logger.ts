@@ -1,5 +1,5 @@
-import { AsyncLocalStorage } from 'async_hooks';
-import { randomBytes } from 'crypto';
+import { AsyncLocalStorage } from 'node:async_hooks';
+import { randomBytes } from 'node:crypto';
 
 import { Logger as TypeOrmLogger, QueryRunner } from 'typeorm';
 import { LoggerService as LoggerServiceInterface } from '@nestjs/common';

@@ -27,7 +27,6 @@ const ErrorsStatusCodes = new Map([
     [custom_errors_1.EmailNotConfirmedError.name, common_1.HttpStatus.UNAUTHORIZED],
     [custom_errors_1.InvalidTokenError.name, common_1.HttpStatus.BAD_REQUEST],
 ]);
-const getErrorStatusCode = (name) => ErrorsStatusCodes.get(name);
 let GlobalExceptionFilter = class GlobalExceptionFilter {
     constructor(httpAdapterHost) {
         this.httpAdapterHost = httpAdapterHost;
@@ -38,7 +37,7 @@ let GlobalExceptionFilter = class GlobalExceptionFilter {
         const httpStatus = exception instanceof common_1.HttpException
             ? exception.getStatus()
             : exception instanceof Error
-                ? getErrorStatusCode(exception.constructor.name) || common_1.HttpStatus.INTERNAL_SERVER_ERROR
+                ? ErrorsStatusCodes.get(exception.constructor.name) || common_1.HttpStatus.INTERNAL_SERVER_ERROR
                 : common_1.HttpStatus.INTERNAL_SERVER_ERROR;
         const message = exception instanceof Error
             ? exception.message || filter_constants_1.NO_INFO_ABOUT_ERROR_MSG

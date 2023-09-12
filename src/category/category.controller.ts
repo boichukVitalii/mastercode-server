@@ -9,10 +9,10 @@ import {
 	NotFoundException,
 	Query,
 } from '@nestjs/common';
-import { CheckPolicies } from 'src/blocks/decorators/check-policies.decorator';
-import { PolicyHandler } from 'src/blocks/handlers/policy.handler';
-import { Action } from 'src/casl/types/casl-types.type';
-import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
+import { CheckPolicies } from '../blocks/decorators/check-policies.decorator';
+import { PolicyHandler } from '../blocks/handlers/policy.handler';
+import { Action } from '../casl/types/casl-types.type';
+import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 import { CATEGORIES_NOT_FOUND_ERROR } from './category.constants';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -28,7 +28,7 @@ export class CategoryController {
 	@Post()
 	@CheckPolicies(new PolicyHandler(Action.Create, Category))
 	async create(@Body() dto: CreateCategoryDto): Promise<Category> {
-		return this.categoryService.create(dto);
+		return await this.categoryService.create(dto);
 	}
 
 	@Get()
@@ -42,21 +42,18 @@ export class CategoryController {
 	@Get(':id')
 	@CheckPolicies(new PolicyHandler(Action.ReadOne, Category))
 	async findOne(@Param('id') id: string): Promise<Category> {
-		const category = await this.categoryService.findOneOrThrow({ id });
-		return category;
+		return await this.categoryService.findOneOrThrow({ id });
 	}
 
 	@Patch(':id')
 	@CheckPolicies(new PolicyHandler(Action.Update, Category))
 	async update(@Param('id') id: string, @Body() dto: UpdateCategoryDto): Promise<Category> {
-		const category = await this.categoryService.updateOne({ id }, dto);
-		return category;
+		return await this.categoryService.updateOne({ id }, dto);
 	}
 
 	@Delete(':id')
 	@CheckPolicies(new PolicyHandler(Action.Delete, Category))
 	async remove(@Param('id') id: string): Promise<Category> {
-		const category = await this.categoryService.remove({ id });
-		return category;
+		return await this.categoryService.remove({ id });
 	}
 }

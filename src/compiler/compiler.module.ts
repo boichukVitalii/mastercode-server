@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { CompilerController } from './compiler.controller';
-import { ProblemModule } from 'src/problem/problem.module';
-import { UserModule } from 'src/user/user.module';
+import { ProblemModule } from '../problem/problem.module';
+import { UserModule } from '../user/user.module';
 import { BullModule } from '@nestjs/bull';
 import { CompilerProcessor } from './compiler.processor';
 import { COMPILE_QUEUE } from './compiler.constants';

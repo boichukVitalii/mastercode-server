@@ -19,8 +19,7 @@ import { Problem } from 'src/problem/entities/problem.entity';
 import { ProblemReaction } from 'src/problem/entities/problem-reaction.entity';
 import { File } from 'src/file/entities/file.entity';
 import { UserQueryDto } from 'src/user/dto/user-query.dto';
-
-const sleep = (ms: number): Promise<any> => new Promise((resolve) => setTimeout(resolve, ms));
+import { setTimeout as sleep } from 'node:timers/promises';
 
 type MockRepository<T extends ObjectLiteral = any> = Partial<
 	Record<keyof Repository<T>, jest.Mock>

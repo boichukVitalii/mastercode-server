@@ -1,7 +1,7 @@
-import { PasswordResetToken } from 'src/auth/entities/password-reset-token.entity';
-import { Comment } from 'src/comment/entities/comment.entity';
-import { File } from 'src/file/entities/file.entity';
-import { ProblemReaction } from 'src/problem/entities/problem-reaction.entity';
+import { PasswordResetToken } from '../../auth/entities/password-reset-token.entity';
+import { Comment } from '../../comment/entities/comment.entity';
+import { File } from '../../file/entities/file.entity';
+import { ProblemReaction } from '../../problem/entities/problem-reaction.entity';
 import { UserSolvedProblem } from './user-solved-problem.entity';
 export declare const UserRole: {
     readonly USER: "user";

@@ -1,10 +1,10 @@
 import { SignupLocalDto } from './dto/signup-local.dto';
-import { UserService } from 'src/user/user.service';
+import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { SigninLocalDto } from './dto/signin-local.dto';
 import { DataSource, Repository } from 'typeorm';
 import { TAuthResponse, TJwtPayload, TTokens } from './types';
-import { EmailService } from 'src/email/email.service';
+import { EmailService } from '../email/email.service';
 import { PasswordResetToken } from './entities/password-reset-token.entity';
 import { HashingService } from './hashing/hashing.service';
 export declare class AuthService {

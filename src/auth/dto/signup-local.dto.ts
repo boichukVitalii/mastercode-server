@@ -1,5 +1,5 @@
 import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { IsPassword } from 'src/blocks/validators/is-password.validator';
+import { IsPassword } from '../../blocks/validators/is-password.validator';
 
 const MIN_PASSWORD_LENGTH = 8;
 

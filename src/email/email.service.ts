@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { createTransport } from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
-import config from 'src/config';
+import config from '../config';
 
 @Injectable()
 export class EmailService {
@@ -23,6 +23,6 @@ export class EmailService {
 	}
 
 	async sendMail(options: Mail.Options): Promise<any> {
-		return this.nodemailerTransport.sendMail(options);
+		return await this.nodemailerTransport.sendMail(options);
 	}
 }

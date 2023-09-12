@@ -1,9 +1,9 @@
-import { Comment } from 'src/comment/entities/comment.entity';
-import { File } from 'src/file/entities/file.entity';
-import { TUserRole, User } from 'src/user/entities/user.entity';
+import { Comment } from '../../comment/entities/comment.entity';
+import { File } from '../../file/entities/file.entity';
+import { TUserRole, User } from '../../user/entities/user.entity';
 import { PasswordResetToken } from '../entities/password-reset-token.entity';
-import { ProblemReaction } from 'src/problem/entities/problem-reaction.entity';
-import { UserSolvedProblem } from 'src/user/entities/user-solved-problem.entity';
+import { ProblemReaction } from '../../problem/entities/problem-reaction.entity';
+import { UserSolvedProblem } from '../../user/entities/user-solved-problem.entity';
 export declare class AuthResponseDto implements User {
     id: string;
     first_name: string;

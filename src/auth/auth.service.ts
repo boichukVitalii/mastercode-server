@@ -1,25 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { SignupLocalDto } from './dto/signup-local.dto';
-import { UserService } from 'src/user/user.service';
+import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { SigninLocalDto } from './dto/signin-local.dto';
 import { DataSource, IsNull, Not, Repository } from 'typeorm';
 import { TAuthResponse, TJwtPayload, TTokens } from './types';
-import config from 'src/config';
+import config from '../config';
 import {
 	EmailNotConfirmedError,
 	InvalidTokenError,
 	WrongCredentialsError,
-} from 'src/errors/custom-errors';
-import { User } from 'src/user/entities/user.entity';
-import { EmailService } from 'src/email/email.service';
-import { randomBytes, createHash } from 'node:crypto';
-import { promisify } from 'node:util';
+} from '../errors/custom-errors';
+import { User } from '../user/entities/user.entity';
+import { EmailService } from '../email/email.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PasswordResetToken } from './entities/password-reset-token.entity';
-import { passwordResetHTML } from 'src/assets/html';
+import { passwordResetHTML } from '../assets/html';
 import { INVALID_RESET_TOKEN_ERROR, TOKEN_HAS_EXPIRED_ERROR } from './auth.constants';
 import { HashingService } from './hashing/hashing.service';
+
+import { randomBytes, createHash } from 'node:crypto';
+import { promisify } from 'node:util';
 
 @Injectable()
 export class AuthService {

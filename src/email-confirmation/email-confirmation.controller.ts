@@ -1,6 +1,6 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { GetCurrentUserId } from 'src/blocks/decorators/get-current-userId.decorator';
-import { Public } from 'src/blocks/decorators/public.decorator';
+import { GetCurrentUserId } from '../blocks/decorators/get-current-userId.decorator';
+import { Public } from '../blocks/decorators/public.decorator';
 import { ConfirmEmailDto } from './dto/confirm-email.dto';
 import { EmailConfirmationService } from './email-confirmation.service';
 import { ApiTags } from '@nestjs/swagger';

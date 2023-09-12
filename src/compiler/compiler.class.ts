@@ -1,5 +1,5 @@
-import { Problem } from 'src/problem/entities/problem.entity';
-import { Language, TLanguage } from 'src/user/entities/user-solved-problem.entity';
+import { Problem } from '../problem/entities/problem.entity';
+import { TLanguage } from '../user/entities/user-solved-problem.entity';
 import { ResponseCompilerDto, Verdict } from './dto/response-compiler.dto';
 import { CodeType } from './dto/compiler.dto';
 
@@ -9,17 +9,12 @@ import { join } from 'node:path';
 import { spawn } from 'node:child_process';
 import { setTimeout, clearTimeout } from 'node:timers';
 
-const TIMEOUT_ERROR_STRING = 'Timeout';
-const TIMEOUT_TIME_MS = 35000;
-
 type TExecutorVerdict = 'Correct' | 'Incorrect';
 type TExecutorResult = [TExecutorVerdict, string, string];
 
+const TIMEOUT_ERROR_STRING = 'Timeout';
+const TIMEOUT_TIME_MS = 35000;
 const commonErrorPattern = 'Error: ';
-const langSpecificErrorPattern = new Map([
-	[Language.JS, 'ReferenceError'],
-	[Language.PYTHON, 'NameError'],
-]);
 
 export class Compiler {
 	private readonly code: CodeType;

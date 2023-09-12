@@ -1,12 +1,12 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
-import { TJwtPayload } from 'src/auth/types';
-import { CaslAbilityFactory } from 'src/casl/casl-ability.factory/casl-ability.factory';
-import { IPolicyHandler } from 'src/casl/types/casl-types.type';
+import { TJwtPayload } from '../../auth/types';
+import { CaslAbilityFactory } from '../../casl/casl-ability.factory/casl-ability.factory';
+import { IPolicyHandler } from '../../casl/types/casl-types.type';
 import { CHECK_POLICIES_KEY } from '../decorators/check-policies.decorator';
 
-const urlStartsWith = '/api/';
+const urlPrefix = '/api/';
 const dbVerificationDependentResources = ['comment'];
 
 @Injectable()
@@ -32,7 +32,7 @@ export class PoliciesGuard implements CanActivate {
 		if (
 			id &&
 			!dbVerificationDependentResources.some((resource) =>
-				request.url.startsWith(urlStartsWith + resource),
+				request.url.startsWith(urlPrefix + resource),
 			)
 		) {
 			id = undefined;

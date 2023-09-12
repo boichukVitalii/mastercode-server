@@ -8,11 +8,11 @@ import {
 	Res,
 	HttpStatus,
 } from '@nestjs/common';
-import { ProblemService } from 'src/problem/problem.service';
+import { ProblemService } from '../problem/problem.service';
 import { CompilerDto } from './dto/compiler.dto';
 import { ResponseCompilerDto } from './dto/response-compiler.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { GetCurrentUserId } from 'src/blocks/decorators/get-current-userId.decorator';
+import { GetCurrentUserId } from '../blocks/decorators/get-current-userId.decorator';
 import { InjectQueue } from '@nestjs/bull';
 import { Response } from 'express';
 import { Queue, JobId } from 'bull';
@@ -27,13 +27,13 @@ export class CompilerController {
 	) {}
 
 	@Post()
-	async compile(
+	async testUserSolution(
 		@Body() dto: CompilerDto,
 		@GetCurrentUserId() userId: string,
 	): Promise<{ jobId: JobId }> {
 		const problem = await this.problemService.findOneOrThrow({ id: dto.problemId });
 		const job = await this.compilerQueue.add(TASK_TESTING_PROCESS, {
-			dto,
+			testingData: dto,
 			userId,
 			problem,
 		});
@@ -53,6 +53,6 @@ export class CompilerController {
 			return { message: `Job with ID ${id} is not completed yet` };
 		}
 		await job.remove();
-		return job.returnvalue as ResponseCompilerDto; //CompilerJobResultDto
+		return job.returnvalue as ResponseCompilerDto;
 	}
 }

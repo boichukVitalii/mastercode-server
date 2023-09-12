@@ -1,11 +1,11 @@
 import { Exclude } from 'class-transformer';
-import { Comment } from 'src/comment/entities/comment.entity';
-import { File } from 'src/file/entities/file.entity';
-import { TUserRole, UserRole, User } from 'src/user/entities/user.entity';
+import { Comment } from '../../comment/entities/comment.entity';
+import { File } from '../../file/entities/file.entity';
+import { TUserRole, UserRole, User } from '../../user/entities/user.entity';
 import { PasswordResetToken } from '../entities/password-reset-token.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { ProblemReaction } from 'src/problem/entities/problem-reaction.entity';
-import { UserSolvedProblem } from 'src/user/entities/user-solved-problem.entity';
+import { ProblemReaction } from '../../problem/entities/problem-reaction.entity';
+import { UserSolvedProblem } from '../../user/entities/user-solved-problem.entity';
 
 export class AuthResponseDto implements User {
 	id: string;

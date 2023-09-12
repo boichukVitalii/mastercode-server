@@ -35,9 +35,11 @@ let CommentController = class CommentController {
         this.userService = userService;
     }
     async create(dto, userId) {
-        const problem = await this.problemService.findOneOrThrow({ id: dto.problemId });
-        const user = await this.userService.findOneOrThrow({ id: userId });
-        return this.commentService.create(dto, user, problem);
+        const [problem, user] = await Promise.all([
+            this.problemService.findOneOrThrow({ id: dto.problemId }),
+            this.userService.findOneOrThrow({ id: userId }),
+        ]);
+        return await this.commentService.create(dto, user, problem);
     }
     async findMany(query) {
         const comments = await this.commentService.findMany(query);
@@ -46,12 +48,10 @@ let CommentController = class CommentController {
         return comments;
     }
     async findOne(id) {
-        const comment = await this.commentService.findOneOrThrow({ id });
-        return comment;
+        return await this.commentService.findOneOrThrow({ id });
     }
     async update(id, dto) {
-        const comment = await this.commentService.updateOne({ id }, dto);
-        return comment;
+        return await this.commentService.updateOne({ id }, dto);
     }
     async remove(id) {
         await this.commentService.remove({ id });

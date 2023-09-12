@@ -12,8 +12,8 @@ import {
 	InvalidTokenError,
 	ServerConflictError,
 	WrongCredentialsError,
-} from 'src/errors/custom-errors';
-import logger from 'src/logger';
+} from '../../errors/custom-errors';
+import logger from '../../logger';
 import { EntityNotFoundError, QueryFailedError } from 'typeorm';
 import { NO_ADD_INFO_ABOUT_ERROR_MSG, NO_INFO_ABOUT_ERROR_MSG } from './filter.constants';
 
@@ -27,8 +27,6 @@ const ErrorsStatusCodes = new Map<string, number>([
 	[InvalidTokenError.name, HttpStatus.BAD_REQUEST],
 ]);
 
-const getErrorStatusCode = (name: string): number | undefined => ErrorsStatusCodes.get(name);
-
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
 	constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
@@ -41,7 +39,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 			exception instanceof HttpException
 				? exception.getStatus()
 				: exception instanceof Error
-				? getErrorStatusCode(exception.constructor.name) || HttpStatus.INTERNAL_SERVER_ERROR
+				? ErrorsStatusCodes.get(exception.constructor.name) || HttpStatus.INTERNAL_SERVER_ERROR
 				: HttpStatus.INTERNAL_SERVER_ERROR;
 
 		const message =

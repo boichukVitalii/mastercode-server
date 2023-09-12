@@ -1,15 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityNotFoundCustomError } from 'src/errors/custom-errors';
-import { File } from 'src/file/entities/file.entity';
-import { FileService } from 'src/file/file.service';
-import { MFile } from 'src/file/mfile.class';
+import { EntityNotFoundCustomError } from '../errors/custom-errors';
+import { File } from '../file/entities/file.entity';
+import { FileService } from '../file/file.service';
+import { MFile } from '../file/mfile.class';
 import { DataSource, DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { USER_NOT_FOUND_ERROR } from './user.constants';
-import { ProblemService } from 'src/problem/problem.service';
-import { PROBLEM_NOT_FOUND_ERROR } from 'src/problem/problem.constants';
-import { Problem, ProblemDifficulty } from 'src/problem/entities/problem.entity';
+import { ProblemService } from '../problem/problem.service';
+import { ProblemDifficulty } from '../problem/entities/problem.entity';
 import { UserSolvedProblem } from './entities/user-solved-problem.entity';
 import { AddSolvedProblemDto } from './dto/add-solved-problem.dto';
 import { UserQueryDto } from './dto/user-query.dto';
@@ -29,16 +28,16 @@ export class UserService {
 
 	async create(data: DeepPartial<User>): Promise<User> {
 		const user = this.userRepository.create(data);
-		return this.userRepository.save(user);
+		return await this.userRepository.save(user);
 	}
 
 	async findMany(options: UserQueryDto): Promise<User[]> {
 		const { skip, take, email } = options;
-		return this.userRepository.find({ skip, take, where: { email } });
+		return await this.userRepository.find({ skip, take, where: { email } });
 	}
 
 	async findOne(where: FindOptionsWhere<User>): Promise<User | null> {
-		return this.userRepository.findOneBy(where);
+		return await this.userRepository.findOneBy(where);
 	}
 
 	async findOneOrThrow(where: FindOptionsWhere<User>): Promise<User> {
@@ -49,18 +48,18 @@ export class UserService {
 
 	async updateOne(where: FindOptionsWhere<User>, data: DeepPartial<User>): Promise<User> {
 		const user = await this.findOneOrThrow(where);
-		return this.userRepository.save({ ...user, ...data });
+		return await this.userRepository.save({ ...user, ...data });
 	}
 
 	async updateMany(options: FindManyOptions<User>, data: DeepPartial<User>): Promise<User[]> {
 		const users = await this.findMany(options);
 		if (!users.length) return [];
-		return this.userRepository.save(users.map((user: User) => ({ ...user, ...data })));
+		return await this.userRepository.save(users.map((user: User) => ({ ...user, ...data })));
 	}
 
 	async remove(where: FindOptionsWhere<User>): Promise<User | null> {
 		const user = await this.findOneOrThrow(where);
-		return this.userRepository.remove(user);
+		return await this.userRepository.remove(user);
 	}
 
 	async uploadAvatar(file: Express.Multer.File, userId: string): Promise<File> {
@@ -82,7 +81,7 @@ export class UserService {
 	async getUserAvatar(userId: string): Promise<File | null> {
 		const user = await this.findOneOrThrow({ id: userId });
 		if (!user.avatar_id) return null;
-		return this.fileService.getFileById(user.avatar_id);
+		return await this.fileService.getFileById(user.avatar_id);
 	}
 
 	async removeAvatar(userId: string): Promise<void> {
@@ -105,17 +104,17 @@ export class UserService {
 	}
 
 	async addSolvedProblem(data: AddSolvedProblemDto): Promise<void> {
-		// const user = await this.findOne({ id: data.user_id });
-		// if (!user) throw new EntityNotFoundCustomError(USER_NOT_FOUND_ERROR);
-		// const problem = await this.problemService.findOne({ id: data.problem_id });
-		// if (!problem) throw new EntityNotFoundCustomError(PROBLEM_NOT_FOUND_ERROR);
+		await Promise.all([
+			this.findOneOrThrow({ id: data.user_id }),
+			this.problemService.findOneOrThrow({ id: data.problem_id }),
+		]);
 
 		const solvedProblem = this.userSolvedProblemRepository.create({ ...data });
 		await this.userSolvedProblemRepository.save(solvedProblem);
 	}
 
 	async getSolvedProblems(userId: string): Promise<UserSolvedProblem[]> {
-		return this.userSolvedProblemRepository.find({
+		return await this.userSolvedProblemRepository.find({
 			where: { user_id: userId },
 			relations: {
 				problem: true,
@@ -126,38 +125,32 @@ export class UserService {
 	async getUserStatistics(userId: string): Promise<UserStatisticsDto> {
 		const solvedProblems = await this.getSolvedProblems(userId);
 		const numberOfSolvedProblems = solvedProblems.length;
-		const numberOfEasyProblems = await this.problemService.getNumberOfProblemsBy({
-			difficulty: ProblemDifficulty.EASY,
-		});
-		const numberOfMediumProblems = await this.problemService.getNumberOfProblemsBy({
-			difficulty: ProblemDifficulty.MEDIUM,
-		});
-		const numberOfHardProblems = await this.problemService.getNumberOfProblemsBy({
-			difficulty: ProblemDifficulty.HARD,
-		});
-		const numberOfSolvedEasyProblems = await this.userSolvedProblemRepository.countBy({
-			problem: {
-				difficulty: ProblemDifficulty.EASY,
-			},
-			user_id: userId,
-		});
-		const numberOfSolvedMediumProblems = await this.userSolvedProblemRepository.countBy({
-			problem: {
-				difficulty: ProblemDifficulty.MEDIUM,
-			},
-			user_id: userId,
-		});
-		const numberOfSolvedHardProblems = await this.userSolvedProblemRepository.countBy({
-			problem: {
-				difficulty: ProblemDifficulty.HARD,
-			},
-			user_id: userId,
-		});
+
+		const [numberOfEasyProblems, numberOfMediumProblems, numberOfHardProblems] = await Promise.all(
+			Object.values(ProblemDifficulty).map(
+				async (difficulty) =>
+					await this.problemService.getNumberOfProblemsBy({
+						difficulty,
+					}),
+			),
+		);
+
+		const [numberOfSolvedEasyProblems, numberOfSolvedMediumProblems, numberOfSolvedHardProblems] =
+			await Promise.all(
+				Object.values(ProblemDifficulty).map(
+					async (difficulty) =>
+						await this.userSolvedProblemRepository.countBy({
+							problem: { difficulty },
+							user_id: userId,
+						}),
+				),
+			);
+
 		return {
 			numberOfSolvedProblems,
 			numberOfEasyProblems,
-			numberOfHardProblems,
 			numberOfMediumProblems,
+			numberOfHardProblems,
 			numberOfSolvedEasyProblems,
 			numberOfSolvedMediumProblems,
 			numberOfSolvedHardProblems,

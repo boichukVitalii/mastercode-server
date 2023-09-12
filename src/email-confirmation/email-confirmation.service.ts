@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import config from 'src/config';
-import { EmailService } from 'src/email/email.service';
-import { EntityNotFoundCustomError, ServerConflictError } from 'src/errors/custom-errors';
-import { UserService } from 'src/user/user.service';
+import config from '../config';
+import { EmailService } from '../email/email.service';
+import { EntityNotFoundCustomError, ServerConflictError } from '../errors/custom-errors';
+import { UserService } from '../user/user.service';
 import {
 	EMAIL_ALREADY_CONFIRMED,
 	NO_USER_WITH_SUCH_EMAIL,
 	TOKEN_VERIFICATION_ERROR,
 } from './email.constants';
 import { TVerificationTokenPayload } from './email.types';
-import { emailConfirmationHTML } from 'src/assets/html';
+import { emailConfirmationHTML } from '../assets/html';
 
 @Injectable()
 export class EmailConfirmationService {
@@ -31,7 +31,7 @@ export class EmailConfirmationService {
 		const subject = 'Email confirmation';
 		const html = emailConfirmationHTML(url);
 
-		return this.emailService.sendMail({
+		return await this.emailService.sendMail({
 			from: config.emailFrom,
 			to: email,
 			subject,
@@ -47,7 +47,7 @@ export class EmailConfirmationService {
 	}
 
 	async decodeConfirmationToken(token: string): Promise<string> {
-		const payload = await this.jwtService.verify<TVerificationTokenPayload>(token, {
+		const payload = await this.jwtService.verifyAsync<TVerificationTokenPayload>(token, {
 			secret: config.verificationSecret,
 		});
 		if (typeof payload === 'object' && 'email' in payload) return payload.email;

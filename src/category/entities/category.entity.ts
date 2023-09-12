@@ -1,4 +1,4 @@
-import { Problem } from 'src/problem/entities/problem.entity';
+import { Problem } from '../../problem/entities/problem.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('category')

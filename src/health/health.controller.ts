@@ -7,7 +7,7 @@ import {
 	HealthIndicatorResult,
 	TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
-import { Public } from 'src/blocks/decorators/public.decorator';
+import { Public } from '../blocks/decorators/public.decorator';
 
 @Controller('health')
 export class HealthController {

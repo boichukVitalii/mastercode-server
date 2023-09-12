@@ -24,13 +24,13 @@ const config_1 = __importDefault(require("../config"));
 const custom_errors_1 = require("../errors/custom-errors");
 const user_entity_1 = require("../user/entities/user.entity");
 const email_service_1 = require("../email/email.service");
-const node_crypto_1 = require("node:crypto");
-const node_util_1 = require("node:util");
 const typeorm_2 = require("@nestjs/typeorm");
 const password_reset_token_entity_1 = require("./entities/password-reset-token.entity");
 const html_1 = require("../assets/html");
 const auth_constants_1 = require("./auth.constants");
 const hashing_service_1 = require("./hashing/hashing.service");
+const node_crypto_1 = require("node:crypto");
+const node_util_1 = require("node:util");
 let AuthService = class AuthService {
     constructor(userService, jwtService, emailService, hashingService, dataSource, passwordResetTokenRepository) {
         this.userService = userService;

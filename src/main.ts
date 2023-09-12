@@ -1,11 +1,11 @@
 import { ValidationPipe } from '@nestjs/common';
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { GlobalExceptionFilter } from './blocks/filters/global-exceptions.filter';
 import { RestLoggingInterceptor } from './blocks/interceptors/rest-logging.interceptor';
 import config from './config';
+import { AppModule } from './app.module';
 import { LoggerService } from './logger';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap(): Promise<void> {
 	const app = await NestFactory.create(AppModule, {

@@ -1,4 +1,4 @@
-import { TUserRole, User } from 'src/user/entities/user.entity';
+import { TUserRole, User } from '../../user/entities/user.entity';
 import { AuthResponseDto } from '../dto/auth-response.dto';
 export declare type TTokens = {
     accessToken: string;

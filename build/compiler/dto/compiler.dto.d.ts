@@ -1,4 +1,4 @@
-import { TLanguage } from 'src/user/entities/user-solved-problem.entity';
+import { TLanguage } from '../../user/entities/user-solved-problem.entity';
 export declare type CodeType = {
     type: 'Buffer';
     data: Array<number>;

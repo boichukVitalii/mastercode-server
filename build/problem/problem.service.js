@@ -28,11 +28,11 @@ let ProblemService = class ProblemService {
     }
     async create(data) {
         const problem = this.problemRepository.create(data);
-        return this.problemRepository.save(problem);
+        return await this.problemRepository.save(problem);
     }
     async findMany(options) {
         const { skip, take, category, difficulty, title } = options;
-        return this.problemRepository.find({
+        return await this.problemRepository.find({
             skip: skip,
             take: take,
             where: {
@@ -46,7 +46,7 @@ let ProblemService = class ProblemService {
         });
     }
     async findOne(where) {
-        return this.problemRepository.findOneBy(where);
+        return await this.problemRepository.findOneBy(where);
     }
     async findOneOrThrow(where) {
         const problem = await this.problemRepository.findOneBy(where);
@@ -56,11 +56,11 @@ let ProblemService = class ProblemService {
     }
     async updateOne(where, data) {
         const problem = await this.findOneOrThrow(where);
-        return this.problemRepository.save({ ...problem, ...data });
+        return await this.problemRepository.save({ ...problem, ...data });
     }
     async remove(where) {
         const problem = await this.findOneOrThrow(where);
-        return this.problemRepository.remove(problem);
+        return await this.problemRepository.remove(problem);
     }
     async toggleReaction(problemId, userId, reactionType) {
         const existedProblemReaction = await this.problemReactionRepository.findOneBy({
@@ -88,12 +88,11 @@ let ProblemService = class ProblemService {
             problem_id: problemId,
             reaction_type: reactionType,
         });
-        const problem1 = await this.updateOne({ id: problemId }, { [reactionType]: reactionCount });
+        const problem = await this.updateOne({ id: problemId }, { [reactionType]: reactionCount });
         if (removedReactionType) {
-            const problem2 = await this.updateOne({ id: problemId }, { [removedReactionType]: problem1[removedReactionType] - 1 });
-            return problem2;
+            return await this.updateOne({ id: problemId }, { [removedReactionType]: problem[removedReactionType] - 1 });
         }
-        return problem1;
+        return problem;
     }
     async getNumberOfProblemsBy(where) {
         return await this.problemRepository.countBy(where);

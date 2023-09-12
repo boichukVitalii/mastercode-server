@@ -31,11 +31,11 @@ let CommentService = class CommentService {
                 id: problem.id,
             },
         });
-        return this.commentRepository.save(comment);
+        return await this.commentRepository.save(comment);
     }
     async findMany(options) {
         const { skip, take, problem_id } = options;
-        return this.commentRepository.find({
+        return await this.commentRepository.find({
             skip,
             take,
             where: {
@@ -46,7 +46,7 @@ let CommentService = class CommentService {
         });
     }
     async findOne(where) {
-        return this.commentRepository.findOneBy(where);
+        return await this.commentRepository.findOneBy(where);
     }
     async findOneOrThrow(where) {
         const comment = await this.commentRepository.findOneBy(where);
@@ -56,11 +56,11 @@ let CommentService = class CommentService {
     }
     async updateOne(where, data) {
         const comment = await this.findOneOrThrow(where);
-        return this.commentRepository.save({ ...comment, ...data });
+        return await this.commentRepository.save({ ...comment, ...data });
     }
     async remove(where) {
         const comment = await this.findOneOrThrow(where);
-        return this.commentRepository.remove(comment);
+        return await this.commentRepository.remove(comment);
     }
 };
 CommentService = __decorate([

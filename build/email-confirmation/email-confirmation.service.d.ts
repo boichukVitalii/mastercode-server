@@ -1,6 +1,6 @@
 import { JwtService } from '@nestjs/jwt';
-import { EmailService } from 'src/email/email.service';
-import { UserService } from 'src/user/user.service';
+import { EmailService } from '../email/email.service';
+import { UserService } from '../user/user.service';
 export declare class EmailConfirmationService {
     private readonly jwtService;
     private readonly emailService;

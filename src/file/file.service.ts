@@ -4,7 +4,7 @@ import { QueryRunner, Repository } from 'typeorm';
 import { FileDto } from './dto/file.dto';
 import { File } from './entities/file.entity';
 import { MFile } from './mfile.class';
-import config from 'src/config';
+import config from '../config';
 
 import * as fs from 'node:fs';
 import { join } from 'node:path';

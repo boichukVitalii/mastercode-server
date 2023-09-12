@@ -25,13 +25,13 @@ let CategoryService = class CategoryService {
     }
     async create(data) {
         const category = this.categoryRepository.create(data);
-        return this.categoryRepository.save(category);
+        return await this.categoryRepository.save(category);
     }
     async findMany(options) {
-        return this.categoryRepository.find(options);
+        return await this.categoryRepository.find(options);
     }
     async findOne(where) {
-        return this.categoryRepository.findOneBy(where);
+        return await this.categoryRepository.findOneBy(where);
     }
     async findOneOrThrow(where) {
         const category = await this.categoryRepository.findOneBy(where);
@@ -41,11 +41,11 @@ let CategoryService = class CategoryService {
     }
     async updateOne(where, data) {
         const category = await this.findOneOrThrow(where);
-        return this.categoryRepository.save({ ...category, ...data });
+        return await this.categoryRepository.save({ ...category, ...data });
     }
     async remove(where) {
         const category = await this.findOneOrThrow(where);
-        return this.categoryRepository.remove(category);
+        return await this.categoryRepository.remove(category);
     }
 };
 CategoryService = __decorate([

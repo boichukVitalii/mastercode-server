@@ -34,14 +34,14 @@ let UserService = class UserService {
     }
     async create(data) {
         const user = this.userRepository.create(data);
-        return this.userRepository.save(user);
+        return await this.userRepository.save(user);
     }
     async findMany(options) {
         const { skip, take, email } = options;
-        return this.userRepository.find({ skip, take, where: { email } });
+        return await this.userRepository.find({ skip, take, where: { email } });
     }
     async findOne(where) {
-        return this.userRepository.findOneBy(where);
+        return await this.userRepository.findOneBy(where);
     }
     async findOneOrThrow(where) {
         const user = await this.userRepository.findOneBy(where);
@@ -51,17 +51,17 @@ let UserService = class UserService {
     }
     async updateOne(where, data) {
         const user = await this.findOneOrThrow(where);
-        return this.userRepository.save({ ...user, ...data });
+        return await this.userRepository.save({ ...user, ...data });
     }
     async updateMany(options, data) {
         const users = await this.findMany(options);
         if (!users.length)
             return [];
-        return this.userRepository.save(users.map((user) => ({ ...user, ...data })));
+        return await this.userRepository.save(users.map((user) => ({ ...user, ...data })));
     }
     async remove(where) {
         const user = await this.findOneOrThrow(where);
-        return this.userRepository.remove(user);
+        return await this.userRepository.remove(user);
     }
     async uploadAvatar(file, userId) {
         const user = await this.findOneOrThrow({ id: userId });
@@ -81,7 +81,7 @@ let UserService = class UserService {
         const user = await this.findOneOrThrow({ id: userId });
         if (!user.avatar_id)
             return null;
-        return this.fileService.getFileById(user.avatar_id);
+        return await this.fileService.getFileById(user.avatar_id);
     }
     async removeAvatar(userId) {
         const queryRunner = this.dataSource.createQueryRunner();
@@ -104,11 +104,15 @@ let UserService = class UserService {
         }
     }
     async addSolvedProblem(data) {
+        await Promise.all([
+            this.findOneOrThrow({ id: data.user_id }),
+            this.problemService.findOneOrThrow({ id: data.problem_id }),
+        ]);
         const solvedProblem = this.userSolvedProblemRepository.create({ ...data });
         await this.userSolvedProblemRepository.save(solvedProblem);
     }
     async getSolvedProblems(userId) {
-        return this.userSolvedProblemRepository.find({
+        return await this.userSolvedProblemRepository.find({
             where: { user_id: userId },
             relations: {
                 problem: true,
@@ -118,38 +122,18 @@ let UserService = class UserService {
     async getUserStatistics(userId) {
         const solvedProblems = await this.getSolvedProblems(userId);
         const numberOfSolvedProblems = solvedProblems.length;
-        const numberOfEasyProblems = await this.problemService.getNumberOfProblemsBy({
-            difficulty: problem_entity_1.ProblemDifficulty.EASY,
-        });
-        const numberOfMediumProblems = await this.problemService.getNumberOfProblemsBy({
-            difficulty: problem_entity_1.ProblemDifficulty.MEDIUM,
-        });
-        const numberOfHardProblems = await this.problemService.getNumberOfProblemsBy({
-            difficulty: problem_entity_1.ProblemDifficulty.HARD,
-        });
-        const numberOfSolvedEasyProblems = await this.userSolvedProblemRepository.countBy({
-            problem: {
-                difficulty: problem_entity_1.ProblemDifficulty.EASY,
-            },
+        const [numberOfEasyProblems, numberOfMediumProblems, numberOfHardProblems] = await Promise.all(Object.values(problem_entity_1.ProblemDifficulty).map(async (difficulty) => await this.problemService.getNumberOfProblemsBy({
+            difficulty,
+        })));
+        const [numberOfSolvedEasyProblems, numberOfSolvedMediumProblems, numberOfSolvedHardProblems] = await Promise.all(Object.values(problem_entity_1.ProblemDifficulty).map(async (difficulty) => await this.userSolvedProblemRepository.countBy({
+            problem: { difficulty },
             user_id: userId,
-        });
-        const numberOfSolvedMediumProblems = await this.userSolvedProblemRepository.countBy({
-            problem: {
-                difficulty: problem_entity_1.ProblemDifficulty.MEDIUM,
-            },
-            user_id: userId,
-        });
-        const numberOfSolvedHardProblems = await this.userSolvedProblemRepository.countBy({
-            problem: {
-                difficulty: problem_entity_1.ProblemDifficulty.HARD,
-            },
-            user_id: userId,
-        });
+        })));
         return {
             numberOfSolvedProblems,
             numberOfEasyProblems,
-            numberOfHardProblems,
             numberOfMediumProblems,
+            numberOfHardProblems,
             numberOfSolvedEasyProblems,
             numberOfSolvedMediumProblems,
             numberOfSolvedHardProblems,

@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { CaslAbilityFactory } from 'src/casl/casl-ability.factory/casl-ability.factory';
+import { CaslAbilityFactory } from '../../casl/casl-ability.factory/casl-ability.factory';
 export declare class PoliciesGuard implements CanActivate {
     private reflector;
     private caslAbilityFactory;

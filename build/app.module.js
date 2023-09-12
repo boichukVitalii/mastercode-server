@@ -54,6 +54,7 @@ const health_module_1 = require("./health/health.module");
 const bull_1 = require("@nestjs/bull");
 const redisStore = __importStar(require("cache-manager-redis-store"));
 const config_1 = __importDefault(require("./config"));
+const logger_1 = require("./logger");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -61,6 +62,7 @@ AppModule = __decorate([
         imports: [
             typeorm_1.TypeOrmModule.forRoot({
                 ...config_1.default.dbConfig,
+                logger: logger_1.queryLogger,
             }),
             cache_manager_1.CacheModule.register({
                 isGlobal: true,

@@ -32,7 +32,7 @@ let ProblemController = class ProblemController {
         this.problemService = problemService;
     }
     async create(dto) {
-        return this.problemService.create(dto);
+        return await this.problemService.create(dto);
     }
     async findMany(query) {
         const problems = await this.problemService.findMany(query);
@@ -41,18 +41,16 @@ let ProblemController = class ProblemController {
         return problems;
     }
     async findOne(id) {
-        const problem = await this.problemService.findOneOrThrow({ id });
-        return problem;
+        return await this.problemService.findOneOrThrow({ id });
     }
     async update(id, dto) {
-        const problem = await this.problemService.updateOne({ id }, dto);
-        return problem;
+        return await this.problemService.updateOne({ id }, dto);
     }
     async remove(id) {
         await this.problemService.remove({ id });
     }
     async toggleReaction({ problem_id, reaction_type }, userId) {
-        return this.problemService.toggleReaction(problem_id, userId, reaction_type);
+        return await this.problemService.toggleReaction(problem_id, userId, reaction_type);
     }
 };
 __decorate([

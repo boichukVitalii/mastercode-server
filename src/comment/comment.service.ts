@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Problem } from 'src/problem/entities/problem.entity';
-import { User } from 'src/user/entities/user.entity';
-import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
+import { Problem } from '../problem/entities/problem.entity';
+import { User } from '../user/entities/user.entity';
+import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
 import { Comment } from './entities/comment.entity';
-import { EntityNotFoundCustomError } from 'src/errors/custom-errors';
+import { EntityNotFoundCustomError } from '../errors/custom-errors';
 import { COMMENT_NOT_FOUND_ERROR } from './comment.constants';
-import { TJwtPayload } from 'src/auth/types';
 import { CommentQueryDto } from './dto/comment-query.dto';
 
 @Injectable()
@@ -21,12 +20,12 @@ export class CommentService {
 				id: problem.id,
 			},
 		});
-		return this.commentRepository.save(comment);
+		return await this.commentRepository.save(comment);
 	}
 
 	async findMany(options: CommentQueryDto): Promise<Comment[]> {
 		const { skip, take, problem_id } = options;
-		return this.commentRepository.find({
+		return await this.commentRepository.find({
 			skip,
 			take,
 			where: {
@@ -38,7 +37,7 @@ export class CommentService {
 	}
 
 	async findOne(where: FindOptionsWhere<Comment>): Promise<Comment | null> {
-		return this.commentRepository.findOneBy(where);
+		return await this.commentRepository.findOneBy(where);
 	}
 
 	async findOneOrThrow(where: FindOptionsWhere<Comment>): Promise<Comment> {
@@ -49,11 +48,11 @@ export class CommentService {
 
 	async updateOne(where: FindOptionsWhere<User>, data: DeepPartial<Comment>): Promise<Comment> {
 		const comment = await this.findOneOrThrow(where);
-		return this.commentRepository.save({ ...comment, ...data });
+		return await this.commentRepository.save({ ...comment, ...data });
 	}
 
 	async remove(where: FindOptionsWhere<Comment>): Promise<Comment> {
 		const comment = await this.findOneOrThrow(where);
-		return this.commentRepository.remove(comment);
+		return await this.commentRepository.remove(comment);
 	}
 }

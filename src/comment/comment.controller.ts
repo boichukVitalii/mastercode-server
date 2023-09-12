@@ -11,18 +11,18 @@ import {
 	HttpCode,
 	HttpStatus,
 } from '@nestjs/common';
-import { CheckPolicies } from 'src/blocks/decorators/check-policies.decorator';
-import { PolicyHandler } from 'src/blocks/handlers/policy.handler';
-import { Action } from 'src/casl/types/casl-types.type';
-import { ProblemService } from 'src/problem/problem.service';
+import { CheckPolicies } from '../blocks/decorators/check-policies.decorator';
+import { PolicyHandler } from '../blocks/handlers/policy.handler';
+import { Action } from '../casl/types/casl-types.type';
+import { ProblemService } from '../problem/problem.service';
 import { COMMENTS_NOT_FOUND_ERROR } from './comment.constants';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Comment } from './entities/comment.entity';
 import { ApiTags } from '@nestjs/swagger';
-import { UserService } from 'src/user/user.service';
-import { GetCurrentUserId } from 'src/blocks/decorators/get-current-userId.decorator';
+import { UserService } from '../user/user.service';
+import { GetCurrentUserId } from '../blocks/decorators/get-current-userId.decorator';
 import { CommentQueryDto } from './dto/comment-query.dto';
 
 @ApiTags('comment')
@@ -40,9 +40,11 @@ export class CommentController {
 		@Body() dto: CreateCommentDto,
 		@GetCurrentUserId() userId: string,
 	): Promise<Comment> {
-		const problem = await this.problemService.findOneOrThrow({ id: dto.problemId });
-		const user = await this.userService.findOneOrThrow({ id: userId });
-		return this.commentService.create(dto, user, problem);
+		const [problem, user] = await Promise.all([
+			this.problemService.findOneOrThrow({ id: dto.problemId }),
+			this.userService.findOneOrThrow({ id: userId }),
+		]);
+		return await this.commentService.create(dto, user, problem);
 	}
 
 	@Get()
@@ -56,15 +58,13 @@ export class CommentController {
 	@Get(':id')
 	@CheckPolicies(new PolicyHandler(Action.ReadOne, Comment))
 	async findOne(@Param('id') id: string): Promise<Comment> {
-		const comment = await this.commentService.findOneOrThrow({ id });
-		return comment;
+		return await this.commentService.findOneOrThrow({ id });
 	}
 
 	@Patch(':id')
 	@CheckPolicies(new PolicyHandler(Action.Update, Comment))
 	async update(@Param('id') id: string, @Body() dto: UpdateCommentDto): Promise<Comment> {
-		const comment = await this.commentService.updateOne({ id }, dto);
-		return comment;
+		return await this.commentService.updateOne({ id }, dto);
 	}
 
 	@Delete(':id')

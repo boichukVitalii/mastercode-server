@@ -26,14 +26,16 @@ import {
 	USER_NOT_FOUND_ERROR,
 } from './user.constants';
 import { UserQueryDto } from './dto/user-query.dto';
-import { AuthResponseDto } from 'src/auth/dto/auth-response.dto';
-import { Action } from 'src/casl/types/casl-types.type';
+import { AuthResponseDto } from '../auth/dto/auth-response.dto';
+import { Action } from '../casl/types/casl-types.type';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { GetCurrentUserId } from 'src/blocks/decorators/get-current-userId.decorator';
+import { GetCurrentUserId } from '../blocks/decorators/get-current-userId.decorator';
 import { Response } from 'express';
-import { createReadStream } from 'node:fs';
-import { CheckPolicies } from 'src/blocks/decorators/check-policies.decorator';
-import { PolicyHandler } from 'src/blocks/handlers/policy.handler';
+import { CheckPolicies } from '../blocks/decorators/check-policies.decorator';
+import { PolicyHandler } from '../blocks/handlers/policy.handler';
+import { AvatarResponseDto } from './dto/avatar-response.dto';
+import { UserSolvedProblem } from './entities/user-solved-problem.entity';
+import { UserStatisticsDto } from './dto/user-statistics.dto';
 import {
 	ApiBadRequestResponse,
 	ApiBody,
@@ -42,10 +44,8 @@ import {
 	ApiTags,
 	ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { AvatarResponseDto } from './dto/avatar-response.dto';
-import { AddSolvedProblemDto } from './dto/add-solved-problem.dto';
-import { UserSolvedProblem } from './entities/user-solved-problem.entity';
-import { UserStatisticsDto } from './dto/user-statistics.dto';
+
+import { createReadStream } from 'node:fs';
 
 @ApiTags('user')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -54,7 +54,7 @@ export class UserController {
 	constructor(private readonly userService: UserService) {}
 
 	@Get()
-	@CheckPolicies(new PolicyHandler(Action.ReadMany, User)) // TODO ReadMany can only admin, fix this in factory
+	@CheckPolicies(new PolicyHandler(Action.ReadMany, User))
 	async findMany(@Query() query: UserQueryDto): Promise<AuthResponseDto[]> {
 		const users = await this.userService.findMany(query);
 		if (!users.length) throw new NotFoundException(USERS_NOT_FOUND_ERROR);
@@ -117,17 +117,6 @@ export class UserController {
 	@HttpCode(HttpStatus.NO_CONTENT)
 	async removeAvatar(@GetCurrentUserId() id: string): Promise<void> {
 		await this.userService.removeAvatar(id);
-	}
-
-	// For testing purposes
-	@Post('add-solved-problem')
-	@HttpCode(HttpStatus.NO_CONTENT)
-	async addSolvedProblems(
-		@GetCurrentUserId() userId: string,
-		@Body() dto: AddSolvedProblemDto,
-	): Promise<void> {
-		dto.user_id = userId;
-		await this.userService.addSolvedProblem({ ...dto });
 	}
 
 	@Get('solved-problems')

@@ -1,19 +1,17 @@
-import { Comment } from 'src/comment/entities/comment.entity';
-import { Category } from 'src/category/entities/category.entity';
+import { Comment } from '../../comment/entities/comment.entity';
+import { Category } from '../../category/entities/category.entity';
 import {
 	Column,
 	CreateDateColumn,
 	Entity,
 	JoinColumn,
-	ManyToMany,
 	ManyToOne,
 	OneToMany,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm';
-import { User } from 'src/user/entities/user.entity';
 import { ProblemReaction } from './problem-reaction.entity';
-import { UserSolvedProblem } from 'src/user/entities/user-solved-problem.entity';
+import { UserSolvedProblem } from '../../user/entities/user-solved-problem.entity';
 
 export const ProblemDifficulty = {
 	EASY: 'easy',
@@ -64,9 +62,6 @@ export class Problem {
 
 	@OneToMany(() => Comment, (comment) => comment.problem)
 	comments: Comment[];
-
-	// @ManyToMany(() => User)
-	// users: User[];
 
 	@OneToMany(() => ProblemReaction, (problemReaction) => problemReaction.problem)
 	problems_reactions: ProblemReaction[];

@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
 import { Problem } from './entities/problem.entity';
 import { ProblemReaction, TReactionType } from './entities/problem-reaction.entity';
-import { EntityNotFoundCustomError } from 'src/errors/custom-errors';
+import { EntityNotFoundCustomError } from '../errors/custom-errors';
 import { PROBLEM_NOT_FOUND_ERROR } from './problem.constants';
 import { ToggleReactionResponseDto } from './dto/toggle-reaction-response.dto';
 import { ProblemQueryDto } from './dto/problem-query.dto';
@@ -19,12 +19,12 @@ export class ProblemService {
 
 	async create(data: DeepPartial<Problem>): Promise<Problem> {
 		const problem = this.problemRepository.create(data);
-		return this.problemRepository.save(problem);
+		return await this.problemRepository.save(problem);
 	}
 
 	async findMany(options: ProblemQueryDto): Promise<Problem[]> {
 		const { skip, take, category, difficulty, title } = options;
-		return this.problemRepository.find({
+		return await this.problemRepository.find({
 			skip: skip,
 			take: take,
 			where: {
@@ -39,7 +39,7 @@ export class ProblemService {
 	}
 
 	async findOne(where: FindOptionsWhere<Problem>): Promise<Problem | null> {
-		return this.problemRepository.findOneBy(where);
+		return await this.problemRepository.findOneBy(where);
 	}
 
 	async findOneOrThrow(where: FindOptionsWhere<Problem>): Promise<Problem> {
@@ -50,12 +50,12 @@ export class ProblemService {
 
 	async updateOne(where: FindOptionsWhere<Problem>, data: DeepPartial<Problem>): Promise<Problem> {
 		const problem = await this.findOneOrThrow(where);
-		return this.problemRepository.save({ ...problem, ...data });
+		return await this.problemRepository.save({ ...problem, ...data });
 	}
 
 	async remove(where: FindOptionsWhere<Problem>): Promise<Problem> {
 		const problem = await this.findOneOrThrow(where);
-		return this.problemRepository.remove(problem);
+		return await this.problemRepository.remove(problem);
 	}
 
 	async toggleReaction(
@@ -105,15 +105,14 @@ export class ProblemService {
 			problem_id: problemId,
 			reaction_type: reactionType,
 		});
-		const problem1 = await this.updateOne({ id: problemId }, { [reactionType]: reactionCount });
+		const problem = await this.updateOne({ id: problemId }, { [reactionType]: reactionCount });
 		if (removedReactionType) {
-			const problem2 = await this.updateOne(
+			return await this.updateOne(
 				{ id: problemId },
-				{ [removedReactionType]: problem1[removedReactionType] - 1 },
+				{ [removedReactionType]: problem[removedReactionType] - 1 },
 			);
-			return problem2;
 		}
-		return problem1;
+		return problem;
 	}
 
 	async getNumberOfProblemsBy(where: FindOptionsWhere<Problem>): Promise<number> {

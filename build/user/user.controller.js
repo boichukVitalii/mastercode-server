@@ -24,12 +24,11 @@ const auth_response_dto_1 = require("../auth/dto/auth-response.dto");
 const casl_types_type_1 = require("../casl/types/casl-types.type");
 const platform_express_1 = require("@nestjs/platform-express");
 const get_current_userId_decorator_1 = require("../blocks/decorators/get-current-userId.decorator");
-const node_fs_1 = require("node:fs");
 const check_policies_decorator_1 = require("../blocks/decorators/check-policies.decorator");
 const policy_handler_1 = require("../blocks/handlers/policy.handler");
-const swagger_1 = require("@nestjs/swagger");
 const avatar_response_dto_1 = require("./dto/avatar-response.dto");
-const add_solved_problem_dto_1 = require("./dto/add-solved-problem.dto");
+const swagger_1 = require("@nestjs/swagger");
+const node_fs_1 = require("node:fs");
 let UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
@@ -65,10 +64,6 @@ let UserController = class UserController {
     }
     async removeAvatar(id) {
         await this.userService.removeAvatar(id);
-    }
-    async addSolvedProblems(userId, dto) {
-        dto.user_id = userId;
-        await this.userService.addSolvedProblem({ ...dto });
     }
     async getSolvedProblems(id) {
         return await this.userService.getSolvedProblems(id);
@@ -151,16 +146,6 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "removeAvatar", null);
-__decorate([
-    (0, common_1.Post)('add-solved-problem'),
-    (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
-    openapi.ApiResponse({ status: common_1.HttpStatus.NO_CONTENT }),
-    __param(0, (0, get_current_userId_decorator_1.GetCurrentUserId)()),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, add_solved_problem_dto_1.AddSolvedProblemDto]),
-    __metadata("design:returntype", Promise)
-], UserController.prototype, "addSolvedProblems", null);
 __decorate([
     (0, common_1.Get)('solved-problems'),
     openapi.ApiResponse({ status: 200, type: [require("./entities/user-solved-problem.entity").UserSolvedProblem] }),

@@ -32,7 +32,7 @@ let EmailService = class EmailService {
         });
     }
     async sendMail(options) {
-        return this.nodemailerTransport.sendMail(options);
+        return await this.nodemailerTransport.sendMail(options);
     }
 };
 EmailService = __decorate([

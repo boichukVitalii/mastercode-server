@@ -27,13 +27,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.queryLogger = exports.LoggerService = exports.setTraceId = void 0;
-const async_hooks_1 = require("async_hooks");
-const crypto_1 = require("crypto");
+const node_async_hooks_1 = require("node:async_hooks");
+const node_crypto_1 = require("node:crypto");
 const pino_1 = __importStar(require("pino"));
 const config_1 = __importDefault(require("./config"));
-const asyncLocalStorage = new async_hooks_1.AsyncLocalStorage();
+const asyncLocalStorage = new node_async_hooks_1.AsyncLocalStorage();
 function setTraceId(requestId) {
-    const traceId = requestId || (0, crypto_1.randomBytes)(16).toString('hex');
+    const traceId = requestId || (0, node_crypto_1.randomBytes)(16).toString('hex');
     asyncLocalStorage.enterWith(traceId);
     return traceId;
 }

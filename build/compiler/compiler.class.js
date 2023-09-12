@@ -24,7 +24,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Compiler = void 0;
-const user_solved_problem_entity_1 = require("../user/entities/user-solved-problem.entity");
 const response_compiler_dto_1 = require("./dto/response-compiler.dto");
 const fsp = __importStar(require("node:fs/promises"));
 const node_crypto_1 = require("node:crypto");
@@ -34,10 +33,6 @@ const node_timers_1 = require("node:timers");
 const TIMEOUT_ERROR_STRING = 'Timeout';
 const TIMEOUT_TIME_MS = 35000;
 const commonErrorPattern = 'Error: ';
-const langSpecificErrorPattern = new Map([
-    [user_solved_problem_entity_1.Language.JS, 'ReferenceError'],
-    [user_solved_problem_entity_1.Language.PYTHON, 'NameError'],
-]);
 class Compiler {
     constructor(code, lang, problem) {
         this.code = code;

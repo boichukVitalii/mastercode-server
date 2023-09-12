@@ -21,7 +21,7 @@ import { BullModule } from '@nestjs/bull';
 import * as redisStore from 'cache-manager-redis-store';
 import config from './config';
 
-//import { queryLogger } from './logger';
+// import { queryLogger } from './logger';
 
 @Module({
 	imports: [

@@ -19,12 +19,12 @@ import { CreateProblemDto } from './dto/create-problem.dto';
 import { UpdateProblemDto } from './dto/update-problem.dto';
 import { PROBLEMS_NOT_FOUND_ERROR } from './problem.constants';
 import { Problem } from './entities/problem.entity';
-import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
-import { PolicyHandler } from 'src/blocks/handlers/policy.handler';
-import { CheckPolicies } from 'src/blocks/decorators/check-policies.decorator';
-import { Action } from 'src/casl/types/casl-types.type';
+import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
+import { PolicyHandler } from '../blocks/handlers/policy.handler';
+import { CheckPolicies } from '../blocks/decorators/check-policies.decorator';
+import { Action } from '../casl/types/casl-types.type';
 import { ApiTags } from '@nestjs/swagger';
-import { GetCurrentUserId } from 'src/blocks/decorators/get-current-userId.decorator';
+import { GetCurrentUserId } from '../blocks/decorators/get-current-userId.decorator';
 import { ToggleReactionDto } from './dto/toggle-reaction.dto';
 import { ToggleReactionResponseDto } from './dto/toggle-reaction-response.dto';
 
@@ -36,7 +36,7 @@ export class ProblemController {
 	@Post()
 	@CheckPolicies(new PolicyHandler(Action.Create, Problem))
 	async create(@Body() dto: CreateProblemDto): Promise<Problem> {
-		return this.problemService.create(dto);
+		return await this.problemService.create(dto);
 	}
 
 	@UseInterceptors(CacheInterceptor)
@@ -52,15 +52,13 @@ export class ProblemController {
 	@Get(':id')
 	@CheckPolicies(new PolicyHandler(Action.ReadOne, Problem))
 	async findOne(@Param('id') id: string): Promise<Problem> {
-		const problem = await this.problemService.findOneOrThrow({ id });
-		return problem;
+		return await this.problemService.findOneOrThrow({ id });
 	}
 
 	@Patch(':id')
 	@CheckPolicies(new PolicyHandler(Action.Update, Problem))
 	async update(@Param('id') id: string, @Body() dto: UpdateProblemDto): Promise<Problem> {
-		const problem = await this.problemService.updateOne({ id }, dto);
-		return problem;
+		return await this.problemService.updateOne({ id }, dto);
 	}
 
 	@Delete(':id')
@@ -75,6 +73,6 @@ export class ProblemController {
 		@Body() { problem_id, reaction_type }: ToggleReactionDto,
 		@GetCurrentUserId() userId: string,
 	): Promise<ToggleReactionResponseDto> {
-		return this.problemService.toggleReaction(problem_id, userId, reaction_type);
+		return await this.problemService.toggleReaction(problem_id, userId, reaction_type);
 	}
 }

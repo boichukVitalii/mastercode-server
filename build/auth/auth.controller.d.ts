@@ -1,4 +1,4 @@
-import { EmailConfirmationService } from 'src/email-confirmation/email-confirmation.service';
+import { EmailConfirmationService } from '../email-confirmation/email-confirmation.service';
 import { AuthService } from './auth.service';
 import { SigninLocalDto } from './dto/signin-local.dto';
 import { SignupLocalDto } from './dto/signup-local.dto';

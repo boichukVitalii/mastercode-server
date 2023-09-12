@@ -1,4 +1,4 @@
-import { Problem } from 'src/problem/entities/problem.entity';
+import { Problem } from '../../problem/entities/problem.entity';
 export declare class Category {
     id: string;
     name: string;

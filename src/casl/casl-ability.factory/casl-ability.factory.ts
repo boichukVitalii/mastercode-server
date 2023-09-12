@@ -5,11 +5,11 @@ import {
 	CreateAbility,
 } from '@casl/ability';
 import { Injectable } from '@nestjs/common';
-import { TJwtPayload } from 'src/auth/types';
-import { Comment } from 'src/comment/entities/comment.entity';
-import { User } from 'src/user/entities/user.entity';
-import { Category } from 'src/category/entities/category.entity';
-import { Problem } from 'src/problem/entities/problem.entity';
+import { TJwtPayload } from '../../auth/types';
+import { Comment } from '../../comment/entities/comment.entity';
+import { User } from '../../user/entities/user.entity';
+import { Category } from '../../category/entities/category.entity';
+import { Problem } from '../../problem/entities/problem.entity';
 import { Action, AppAbility, FlatComment, Subjects } from '../types/casl-types.type';
 
 @Injectable()

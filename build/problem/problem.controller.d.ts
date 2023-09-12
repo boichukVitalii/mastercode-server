@@ -2,7 +2,7 @@ import { ProblemService } from './problem.service';
 import { CreateProblemDto } from './dto/create-problem.dto';
 import { UpdateProblemDto } from './dto/update-problem.dto';
 import { Problem } from './entities/problem.entity';
-import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
+import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 import { ToggleReactionDto } from './dto/toggle-reaction.dto';
 import { ToggleReactionResponseDto } from './dto/toggle-reaction-response.dto';
 export declare class ProblemController {

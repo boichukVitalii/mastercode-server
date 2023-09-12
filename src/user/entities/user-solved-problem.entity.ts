@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
-import { User } from 'src/user/entities/user.entity';
+import { User } from './user.entity';
 import { Problem } from '../../problem/entities/problem.entity';
 
 export const Language = {

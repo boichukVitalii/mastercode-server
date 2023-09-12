@@ -55,13 +55,13 @@ let AuthController = class AuthController {
         };
     }
     async auth(dto) {
-        return this.googleAuthService.authenticate(dto.token);
+        return await this.googleAuthService.authenticate(dto.token);
     }
     async logout(userId) {
         await this.authService.logout(userId);
     }
     async refreshTokens(userId, refreshToken) {
-        return this.authService.refreshTokens(userId, refreshToken);
+        return await this.authService.refreshTokens(userId, refreshToken);
     }
     async getPasswordResetToken({ email }) {
         await this.authService.generatePasswordResetToken(email);

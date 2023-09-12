@@ -1,7 +1,7 @@
-import { Comment } from 'src/comment/entities/comment.entity';
-import { Category } from 'src/category/entities/category.entity';
+import { Comment } from '../../comment/entities/comment.entity';
+import { Category } from '../../category/entities/category.entity';
 import { ProblemReaction } from './problem-reaction.entity';
-import { UserSolvedProblem } from 'src/user/entities/user-solved-problem.entity';
+import { UserSolvedProblem } from '../../user/entities/user-solved-problem.entity';
 export declare const ProblemDifficulty: {
     readonly EASY: "easy";
     readonly MEDIUM: "medium";

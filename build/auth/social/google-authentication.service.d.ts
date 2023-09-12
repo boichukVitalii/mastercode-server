@@ -1,8 +1,8 @@
 import { OnModuleInit } from '@nestjs/common';
 import { AuthService } from '../auth.service';
-import { UserService } from 'src/user/user.service';
+import { UserService } from '../../user/user.service';
 import { TAuthResponse } from '../types';
-import { EmailConfirmationService } from 'src/email-confirmation/email-confirmation.service';
+import { EmailConfirmationService } from '../../email-confirmation/email-confirmation.service';
 export declare class GoogleAuthService implements OnModuleInit {
     private readonly authService;
     private readonly userService;

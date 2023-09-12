@@ -1,9 +1,9 @@
 /// <reference types="multer" />
-import { File } from 'src/file/entities/file.entity';
-import { FileService } from 'src/file/file.service';
+import { File } from '../file/entities/file.entity';
+import { FileService } from '../file/file.service';
 import { DataSource, DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import { ProblemService } from 'src/problem/problem.service';
+import { ProblemService } from '../problem/problem.service';
 import { UserSolvedProblem } from './entities/user-solved-problem.entity';
 import { AddSolvedProblemDto } from './dto/add-solved-problem.dto';
 import { UserQueryDto } from './dto/user-query.dto';

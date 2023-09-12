@@ -1,5 +1,5 @@
-import { Problem } from 'src/problem/entities/problem.entity';
-import { TLanguage } from 'src/user/entities/user-solved-problem.entity';
+import { Problem } from '../problem/entities/problem.entity';
+import { TLanguage } from '../user/entities/user-solved-problem.entity';
 import { ResponseCompilerDto } from './dto/response-compiler.dto';
 import { CodeType } from './dto/compiler.dto';
 export declare class Compiler {

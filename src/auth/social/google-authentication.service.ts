@@ -1,11 +1,11 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { OAuth2Client, TokenPayload } from 'google-auth-library';
 import { AuthService } from '../auth.service';
-import config from 'src/config';
-import { WrongCredentialsError } from 'src/errors/custom-errors';
-import { UserService } from 'src/user/user.service';
+import config from '../../config';
+import { WrongCredentialsError } from '../../errors/custom-errors';
+import { UserService } from '../../user/user.service';
 import { TAuthResponse } from '../types';
-import { EmailConfirmationService } from 'src/email-confirmation/email-confirmation.service';
+import { EmailConfirmationService } from '../../email-confirmation/email-confirmation.service';
 import { COULD_NOT_OBTAIN_EMAIL_GOOGLE_ERROR } from '../auth.constants';
 
 @Injectable()

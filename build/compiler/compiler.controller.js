@@ -26,10 +26,10 @@ let CompilerController = class CompilerController {
         this.problemService = problemService;
         this.compilerQueue = compilerQueue;
     }
-    async compile(dto, userId) {
+    async testUserSolution(dto, userId) {
         const problem = await this.problemService.findOneOrThrow({ id: dto.problemId });
         const job = await this.compilerQueue.add(compiler_constants_1.TASK_TESTING_PROCESS, {
-            dto,
+            testingData: dto,
             userId,
             problem,
         });
@@ -56,7 +56,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [compiler_dto_1.CompilerDto, String]),
     __metadata("design:returntype", Promise)
-], CompilerController.prototype, "compile", null);
+], CompilerController.prototype, "testUserSolution", null);
 __decorate([
     (0, common_1.Get)('job/:id'),
     openapi.ApiResponse({ status: 200, type: Object }),

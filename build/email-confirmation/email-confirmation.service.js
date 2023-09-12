@@ -36,7 +36,7 @@ let EmailConfirmationService = class EmailConfirmationService {
         const url = `${config_1.default.emailConfirmationUrl}?token=${token}`;
         const subject = 'Email confirmation';
         const html = (0, html_1.emailConfirmationHTML)(url);
-        return this.emailService.sendMail({
+        return await this.emailService.sendMail({
             from: config_1.default.emailFrom,
             to: email,
             subject,
@@ -52,7 +52,7 @@ let EmailConfirmationService = class EmailConfirmationService {
         await this.userService.updateOne({ email }, { is_email_confirmed: true });
     }
     async decodeConfirmationToken(token) {
-        const payload = await this.jwtService.verify(token, {
+        const payload = await this.jwtService.verifyAsync(token, {
             secret: config_1.default.verificationSecret,
         });
         if (typeof payload === 'object' && 'email' in payload)

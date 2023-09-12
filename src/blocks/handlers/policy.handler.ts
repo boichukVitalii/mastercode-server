@@ -5,8 +5,8 @@ import {
 	IPolicyHandler,
 	Subjects,
 	TAction,
-} from 'src/casl/types/casl-types.type';
-import config from 'src/config';
+} from '../../casl/types/casl-types.type';
+import config from '../../config';
 
 export class PolicyHandler implements IPolicyHandler {
 	constructor(public readonly action: TAction, public readonly entity: ClassConstructor<Entity>) {}
