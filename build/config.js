@@ -23,6 +23,15 @@ const dbConfig = {
     migrations: [migrationsDir],
     synchronize: true,
 };
+const dbTestConfig = {
+    type: 'postgres',
+    url: process.env.DB_TEST_URL,
+    entities: [(0, node_path_1.join)(__dirname, `/**/**.entity{.ts,.js}`)],
+    migrationsRun: true,
+    migrationsTableName: 'migrations',
+    migrations: [migrationsDir],
+    synchronize: true,
+};
 const redisCacheConfig = {
     host: process.env.REDIS_HOST,
     port: parseInt(process.env.REDIS_CACHE_PORT, 10),
@@ -37,6 +46,7 @@ exports.default = {
     logLevel: process.env.LOG_LEVEL,
     env: process.env.ENV_NAME,
     dbConfig,
+    dbTestConfig,
     redisCacheConfig,
     redisQueueConfig,
     dataSourceInit: exports.dataSource.initialize(),

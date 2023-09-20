@@ -5,7 +5,8 @@ import { GlobalExceptionFilter } from './blocks/filters/global-exceptions.filter
 import { RestLoggingInterceptor } from './blocks/interceptors/rest-logging.interceptor';
 import config from './config';
 import { AppModule } from './app.module';
-import { LoggerService } from './logger';
+import logger, { LoggerService } from './logger';
+import { validationPipeOptions } from './common/config-options/config-options';
 
 async function bootstrap(): Promise<void> {
 	const app = await NestFactory.create(AppModule, {
@@ -14,17 +15,10 @@ async function bootstrap(): Promise<void> {
 	app.setGlobalPrefix('api');
 	app.enableCors();
 	app.useGlobalInterceptors(new RestLoggingInterceptor());
-	app.useGlobalPipes(
-		new ValidationPipe({
-			whitelist: true,
-			transform: true,
-			forbidNonWhitelisted: true,
-			stopAtFirstError: true,
-		}),
-	);
+	app.useGlobalPipes(new ValidationPipe(validationPipeOptions));
 
 	const httpAdapter = app.get(HttpAdapterHost);
-	app.useGlobalFilters(new GlobalExceptionFilter(httpAdapter));
+	app.useGlobalFilters(new GlobalExceptionFilter(httpAdapter, logger));
 
 	const options = new DocumentBuilder()
 		.addBearerAuth()

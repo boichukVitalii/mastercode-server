@@ -13,9 +13,10 @@ import {
 	ServerConflictError,
 	WrongCredentialsError,
 } from '../../errors/custom-errors';
-import logger from '../../logger';
 import { EntityNotFoundError, QueryFailedError } from 'typeorm';
+import { Logger, Level } from 'pino';
 import { NO_ADD_INFO_ABOUT_ERROR_MSG, NO_INFO_ABOUT_ERROR_MSG } from './filter.constants';
+import { TFilterResponseBody } from './filter.type';
 
 const ErrorsStatusCodes = new Map<string, number>([
 	[QueryFailedError.name, HttpStatus.UNPROCESSABLE_ENTITY],
@@ -29,7 +30,10 @@ const ErrorsStatusCodes = new Map<string, number>([
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
-	constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
+	constructor(
+		private readonly httpAdapterHost: HttpAdapterHost,
+		public readonly logger: Pick<Logger, Level>,
+	) {}
 
 	catch(exception: unknown, host: ArgumentsHost): void {
 		const { httpAdapter } = this.httpAdapterHost;
@@ -54,10 +58,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 				? exception.driverError.detail || NO_ADD_INFO_ABOUT_ERROR_MSG
 				: NO_ADD_INFO_ABOUT_ERROR_MSG;
 
-		logger.error(exception);
+		this.logger.error(exception);
 
 		const request = ctx.getRequest();
-		const responseBody = {
+		const responseBody: TFilterResponseBody = {
 			statusCode: httpStatus,
 			message,
 			additionalInfo,

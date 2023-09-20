@@ -81,7 +81,7 @@ let FileService = class FileService {
         if (!file)
             return null;
         const deletedFile = await queryRunner.manager.remove(file_entity_1.File, file);
-        await fs.promises.rm(file.path);
+        await fs.promises.rm(file.path, { force: true });
         return deletedFile;
     }
     async convertToWebP(fileBuffer) {

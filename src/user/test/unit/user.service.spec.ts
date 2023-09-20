@@ -19,7 +19,6 @@ import { Problem } from 'src/problem/entities/problem.entity';
 import { ProblemReaction } from 'src/problem/entities/problem-reaction.entity';
 import { File } from 'src/file/entities/file.entity';
 import { UserQueryDto } from 'src/user/dto/user-query.dto';
-import { setTimeout as sleep } from 'node:timers/promises';
 
 type MockRepository<T extends ObjectLiteral = any> = Partial<
 	Record<keyof Repository<T>, jest.Mock>
@@ -32,16 +31,11 @@ const createMockRepository = <T extends ObjectLiteral = any>(): MockRepository<T
 	remove: jest.fn(),
 });
 
-describe('UserService', () => {
+describe('UserService Unit', () => {
 	let service: UserService;
 	let userRepository: MockRepository;
 
-	// need to fix
-	afterEach(async () => {
-		await sleep(200);
-	});
-
-	beforeEach(async () => {
+	beforeAll(async () => {
 		const module: TestingModule = await Test.createTestingModule({
 			providers: [
 				UserService,
@@ -61,30 +55,28 @@ describe('UserService', () => {
 		jest.clearAllMocks();
 	});
 
-	it('should be defined', () => {
-		expect(service).toBeDefined();
-	});
-
 	describe('create', () => {
 		describe('when create is called', () => {
 			let user: User;
 			let createSpy: jest.SpyInstance;
 			let saveSpy: jest.SpyInstance;
+			const userDto = createUserStub();
+			const createdUser = createdUserStub();
 
 			beforeEach(async () => {
-				userRepository.save?.mockImplementation((user: User) => Promise.resolve(createdUserStub()));
+				userRepository.save?.mockImplementation((user: User) => Promise.resolve(createdUser));
 				createSpy = jest.spyOn(userRepository, 'create');
 				saveSpy = jest.spyOn(userRepository, 'save');
-				user = await service.create(createUserStub());
+				user = await service.create(userDto);
 			});
 
 			it('should call the userRepository', () => {
-				expect(createSpy).toHaveBeenCalledWith(createUserStub());
-				expect(saveSpy).toHaveBeenCalledWith(createUserStub());
+				expect(createSpy).toHaveBeenCalledWith(userDto);
+				expect(saveSpy).toHaveBeenCalledWith(userDto);
 			});
 
 			it('should return a user', () => {
-				expect(user).toEqual(createdUserStub());
+				expect(user).toEqual(createdUser);
 			});
 		});
 	});
@@ -92,13 +84,14 @@ describe('UserService', () => {
 	describe('findOne', () => {
 		describe('when findOne is called', () => {
 			let user: User | null;
+			const createdUser = createdUserStub();
 
 			describe('when user with such search key exists', () => {
-				const where: FindOptionsWhere<User> = { id: createdUserStub().id };
+				const where: FindOptionsWhere<User> = { id: createdUser.id };
 
 				beforeEach(async () => {
 					userRepository.findOneBy?.mockImplementation((where: FindOptionsWhere<User>) =>
-						Promise.resolve(createdUserStub()),
+						Promise.resolve(createdUser),
 					);
 					jest.spyOn(userRepository, 'findOneBy');
 					user = await service.findOne(where);
@@ -109,12 +102,12 @@ describe('UserService', () => {
 				});
 
 				it('should return a user', () => {
-					expect(user).toEqual(createdUserStub());
+					expect(user).toEqual(createdUser);
 				});
 			});
 
 			describe('otherwise', () => {
-				const where: FindOptionsWhere<User> = { id: createdUserStub().id + 'f' };
+				const where: FindOptionsWhere<User> = { id: createdUser.id + 'f' };
 
 				beforeEach(async () => {
 					userRepository.findOneBy?.mockImplementation((where: FindOptionsWhere<User>) =>
@@ -138,13 +131,14 @@ describe('UserService', () => {
 	describe('findMany', () => {
 		describe('when findMany is called', () => {
 			let users: User[];
+			const createdUser = createdUserStub();
 
 			describe('when users are found by given options', () => {
 				const options: UserQueryDto = { skip: 0, take: 1, email: undefined };
 
 				beforeEach(async () => {
 					userRepository.find?.mockImplementation((options: FindManyOptions<User>) =>
-						Promise.resolve([createdUserStub()]),
+						Promise.resolve([createdUser]),
 					);
 					jest.spyOn(userRepository, 'find');
 					users = await service.findMany(options);
@@ -159,7 +153,7 @@ describe('UserService', () => {
 				});
 
 				it('should return array with one user', () => {
-					expect(users).toEqual([createdUserStub()]);
+					expect(users).toEqual([createdUser]);
 				});
 			});
 

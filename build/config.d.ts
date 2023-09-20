@@ -5,6 +5,7 @@ declare const _default: {
     logLevel: import("pino").default.Level;
     env: string | undefined;
     dbConfig: PostgresConnectionOptions;
+    dbTestConfig: PostgresConnectionOptions;
     redisCacheConfig: {
         host: string | undefined;
         port: number;

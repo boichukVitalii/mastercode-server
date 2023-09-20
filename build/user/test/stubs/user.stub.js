@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createdUserStub = exports.createUserStub = void 0;
+const node_crypto_1 = require("node:crypto");
 const createUserStub = () => {
     return {
         first_name: 'Ben',
@@ -12,7 +13,7 @@ const createUserStub = () => {
 exports.createUserStub = createUserStub;
 const createdUserStub = () => {
     return {
-        id: '0324ad4a-f41c-4c39-b652-8f5634561d21',
+        id: (0, node_crypto_1.randomUUID)(),
         first_name: 'Ben',
         last_name: 'Drinkwater',
         avatar_id: null,
@@ -21,8 +22,12 @@ const createdUserStub = () => {
         password_hash: '$2y$10$lpijXA4pH5jXcNG1qahBBuEe/cfnSg9Z.bJNUYaKik.wh89jiJpvG',
         roles: ['user'],
         is_email_confirmed: false,
-        created_at: '2023-03-21T21:41:09.623Z',
-        updated_at: '2023-03-29T19:07:01.624Z',
+        comments: [],
+        password_reset_tokens: [],
+        problems_reactions: [],
+        solved_problems: [],
+        created_at: new Date(),
+        updated_at: new Date(),
     };
 };
 exports.createdUserStub = createdUserStub;

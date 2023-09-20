@@ -3,10 +3,12 @@ import { Problem } from './entities/problem.entity';
 import { ProblemReaction, TReactionType } from './entities/problem-reaction.entity';
 import { ToggleReactionResponseDto } from './dto/toggle-reaction-response.dto';
 import { ProblemQueryDto } from './dto/problem-query.dto';
+import { Cache } from 'cache-manager';
 export declare class ProblemService {
     private readonly problemRepository;
     private readonly problemReactionRepository;
-    constructor(problemRepository: Repository<Problem>, problemReactionRepository: Repository<ProblemReaction>);
+    private cacheManager;
+    constructor(problemRepository: Repository<Problem>, problemReactionRepository: Repository<ProblemReaction>, cacheManager: Cache);
     create(data: DeepPartial<Problem>): Promise<Problem>;
     findMany(options: ProblemQueryDto): Promise<Problem[]>;
     findOne(where: FindOptionsWhere<Problem>): Promise<Problem | null>;

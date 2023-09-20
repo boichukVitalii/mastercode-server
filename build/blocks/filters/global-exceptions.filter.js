@@ -8,14 +8,10 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GlobalExceptionFilter = void 0;
 const common_1 = require("@nestjs/common");
 const custom_errors_1 = require("../../errors/custom-errors");
-const logger_1 = __importDefault(require("../../logger"));
 const typeorm_1 = require("typeorm");
 const filter_constants_1 = require("./filter.constants");
 const ErrorsStatusCodes = new Map([
@@ -28,8 +24,9 @@ const ErrorsStatusCodes = new Map([
     [custom_errors_1.InvalidTokenError.name, common_1.HttpStatus.BAD_REQUEST],
 ]);
 let GlobalExceptionFilter = class GlobalExceptionFilter {
-    constructor(httpAdapterHost) {
+    constructor(httpAdapterHost, logger) {
         this.httpAdapterHost = httpAdapterHost;
+        this.logger = logger;
     }
     catch(exception, host) {
         const { httpAdapter } = this.httpAdapterHost;
@@ -47,7 +44,7 @@ let GlobalExceptionFilter = class GlobalExceptionFilter {
             : exception instanceof typeorm_1.QueryFailedError
                 ? exception.driverError.detail || filter_constants_1.NO_ADD_INFO_ABOUT_ERROR_MSG
                 : filter_constants_1.NO_ADD_INFO_ABOUT_ERROR_MSG;
-        logger_1.default.error(exception);
+        this.logger.error(exception);
         const request = ctx.getRequest();
         const responseBody = {
             statusCode: httpStatus,
@@ -62,7 +59,7 @@ let GlobalExceptionFilter = class GlobalExceptionFilter {
 };
 GlobalExceptionFilter = __decorate([
     (0, common_1.Catch)(),
-    __metadata("design:paramtypes", [Object])
+    __metadata("design:paramtypes", [Object, Object])
 ], GlobalExceptionFilter);
 exports.GlobalExceptionFilter = GlobalExceptionFilter;
 //# sourceMappingURL=global-exceptions.filter.js.map

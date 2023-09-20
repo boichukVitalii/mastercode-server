@@ -44,7 +44,7 @@ export class FileService {
 		const file = await queryRunner.manager.findOneBy(File, { id });
 		if (!file) return null;
 		const deletedFile = await queryRunner.manager.remove<File>(File, file);
-		await fs.promises.rm(file.path);
+		await fs.promises.rm(file.path, { force: true });
 		return deletedFile;
 	}
 

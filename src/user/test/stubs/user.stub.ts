@@ -1,6 +1,6 @@
 import { User } from '../../entities/user.entity';
 import { DeepPartial } from 'typeorm';
-//import { randomUUID } from 'node:crypto';
+import { randomUUID } from 'node:crypto';
 
 export const createUserStub = (): DeepPartial<User> => {
 	return {
@@ -11,9 +11,9 @@ export const createUserStub = (): DeepPartial<User> => {
 	};
 };
 
-export const createdUserStub = (): DeepPartial<User> => {
+export const createdUserStub = (): User => {
 	return {
-		id: '0324ad4a-f41c-4c39-b652-8f5634561d21',
+		id: randomUUID(),
 		first_name: 'Ben',
 		last_name: 'Drinkwater',
 		avatar_id: null,
@@ -22,7 +22,11 @@ export const createdUserStub = (): DeepPartial<User> => {
 		password_hash: '$2y$10$lpijXA4pH5jXcNG1qahBBuEe/cfnSg9Z.bJNUYaKik.wh89jiJpvG',
 		roles: ['user'],
 		is_email_confirmed: false,
-		created_at: '2023-03-21T21:41:09.623Z',
-		updated_at: '2023-03-29T19:07:01.624Z',
+		comments: [],
+		password_reset_tokens: [],
+		problems_reactions: [],
+		solved_problems: [],
+		created_at: new Date(),
+		updated_at: new Date(),
 	};
 };

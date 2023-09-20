@@ -60,7 +60,16 @@ let UserController = class UserController {
             throw new common_1.NotFoundException(user_constants_1.AVATAR_NOT_FOUND_ERROR);
         const stream = (0, node_fs_1.createReadStream)(avatar.path);
         res.set({ 'Content-Type': avatar.mimetype });
-        return new common_1.StreamableFile(stream);
+        return new common_1.StreamableFile(stream).setErrorHandler((err, handlerRes) => {
+            if (err.code === 'ENOENT') {
+                res.set({ 'Content-Type': 'text/plain' });
+                handlerRes.statusCode = common_1.HttpStatus.NOT_FOUND;
+                handlerRes.send(user_constants_1.AVATAR_NOT_FOUND_ERROR);
+            }
+            else {
+                handlerRes.send(err.message);
+            }
+        });
     }
     async removeAvatar(id) {
         await this.userService.removeAvatar(id);

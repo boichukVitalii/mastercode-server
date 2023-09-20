@@ -110,7 +110,15 @@ export class UserController {
 		if (!avatar) throw new NotFoundException(AVATAR_NOT_FOUND_ERROR);
 		const stream = createReadStream(avatar.path);
 		res.set({ 'Content-Type': avatar.mimetype });
-		return new StreamableFile(stream);
+		return new StreamableFile(stream).setErrorHandler((err, handlerRes) => {
+			if ((err as any).code === 'ENOENT') {
+				res.set({ 'Content-Type': 'text/plain' });
+				handlerRes.statusCode = HttpStatus.NOT_FOUND;
+				handlerRes.send(AVATAR_NOT_FOUND_ERROR);
+			} else {
+				handlerRes.send(err.message);
+			}
+		});
 	}
 
 	@Delete('delete/avatar')
