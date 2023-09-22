@@ -4,24 +4,23 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-     - name: Checkout
-       uses: actions/checkout@v4
-     - name: Install deps
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install deps
         run: npm ci
-     - name: Lint
+      - name: Lint
         run: npm run lint
   test:
     needs: [lint]
     runs-on: ubuntu-latest
     steps:
-     - name: Checkout
-       uses: actions/checkout@v4
-     - name: Install deps
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install deps
         run: npm ci
-     - name: Unit tests
+      - name: Unit tests
         run: npm run test
-     - name: Integration tests
+      - name: Integration tests
         run: npm run test:int
-     - name: E2E tests
+      - name: E2E tests
         run: npm run test:e2e
-    
