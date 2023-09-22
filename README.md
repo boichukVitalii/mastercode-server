@@ -1,11 +1,11 @@
-#Mastercode
+# Mastercode
 
 ## Description
 
 In this repository you can see the server side of a Mastercode web application.
 **Mastercode** is an educational web platform that pursues the goal of helping programmers become better by solving different problems on the provided "training area" page. You may know similar platforms such as LeetCode, CodeWars, Coderbyte.
 
-##Technologies and libraries used in the project:
+## Technologies and libraries used in the project:
 
 - Node.js
 - Nest.js
