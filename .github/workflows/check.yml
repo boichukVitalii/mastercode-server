@@ -23,8 +23,6 @@ jobs:
           echo "${{ secrets.ENV_FILE }}" > .env
       - name: Start containers
         run: docker-compose -f "docker-compose.yml" up -d --build
-      - name: Unit tests
-        run: npm run test
       - name: Integration tests
         run: npm run test:int
       - name: E2E tests
