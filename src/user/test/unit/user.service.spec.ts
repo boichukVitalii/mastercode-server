@@ -19,6 +19,7 @@ import { Problem } from 'src/problem/entities/problem.entity';
 import { ProblemReaction } from 'src/problem/entities/problem-reaction.entity';
 import { File } from 'src/file/entities/file.entity';
 import { UserQueryDto } from 'src/user/dto/user-query.dto';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 type MockRepository<T extends ObjectLiteral = any> = Partial<
 	Record<keyof Repository<T>, jest.Mock>
@@ -42,6 +43,7 @@ describe('UserService Unit', () => {
 				ProblemService,
 				FileService,
 				{ provide: DataSource, useValue: {} },
+				{ provide: CACHE_MANAGER, useValue: {} },
 				{ provide: getRepositoryToken(User), useValue: createMockRepository() },
 				{ provide: getRepositoryToken(Problem), useValue: createMockRepository() },
 				{ provide: getRepositoryToken(ProblemReaction), useValue: createMockRepository() },

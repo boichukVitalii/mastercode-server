@@ -11,7 +11,6 @@ import {
 	HttpCode,
 	HttpStatus,
 	UseInterceptors,
-	CacheInterceptor,
 	CacheTTL,
 } from '@nestjs/common';
 import { ProblemService } from './problem.service';
@@ -27,6 +26,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { GetCurrentUserId } from '../blocks/decorators/get-current-userId.decorator';
 import { ToggleReactionDto } from './dto/toggle-reaction.dto';
 import { ToggleReactionResponseDto } from './dto/toggle-reaction-response.dto';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @ApiTags('problem')
 @Controller('problem')
@@ -40,13 +40,12 @@ export class ProblemController {
 	}
 
 	@UseInterceptors(CacheInterceptor)
-	// @CacheTTL(1000 * 60)
+	@CacheTTL(1000 * 60)
 	@Get()
 	@CheckPolicies(new PolicyHandler(Action.ReadMany, Problem))
 	async findMany(@Query() query: PaginationQueryDto): Promise<Problem[]> {
 		const problems = await this.problemService.findMany(query);
 		if (!problems.length) throw new NotFoundException(PROBLEMS_NOT_FOUND_ERROR);
-		console.log('hello');
 		return problems;
 	}
 

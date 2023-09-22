@@ -4,7 +4,7 @@ export declare const Language: {
     readonly JS: "js";
     readonly PYTHON: "py";
 };
-export declare type TLanguage = typeof Language[keyof typeof Language];
+export type TLanguage = typeof Language[keyof typeof Language];
 export declare class UserSolvedProblem {
     problem_id: string;
     user_id: string;

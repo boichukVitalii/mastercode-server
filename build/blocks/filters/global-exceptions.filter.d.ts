@@ -1,4 +1,5 @@
-import { ArgumentsHost, ExceptionFilter, HttpAdapterHost } from '@nestjs/common';
+import { ArgumentsHost, ExceptionFilter } from '@nestjs/common';
+import { HttpAdapterHost } from '@nestjs/core';
 import { Logger, Level } from 'pino';
 export declare class GlobalExceptionFilter implements ExceptionFilter {
     private readonly httpAdapterHost;

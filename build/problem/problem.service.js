@@ -21,6 +21,7 @@ const problem_reaction_entity_1 = require("./entities/problem-reaction.entity");
 const custom_errors_1 = require("../errors/custom-errors");
 const problem_constants_1 = require("./problem.constants");
 const toggle_reaction_response_dto_1 = require("./dto/toggle-reaction-response.dto");
+const cache_manager_1 = require("@nestjs/cache-manager");
 let ProblemService = class ProblemService {
     constructor(problemRepository, problemReactionRepository, cacheManager) {
         this.problemRepository = problemRepository;
@@ -33,10 +34,6 @@ let ProblemService = class ProblemService {
     }
     async findMany(options) {
         const { skip, take, category, difficulty, title } = options;
-        await this.cacheManager.store.set('key', 1);
-        const key = await this.cacheManager.store.get('key');
-        console.log(key);
-        console.log('many');
         return await this.problemRepository.find({
             skip: skip,
             take: take,
@@ -107,7 +104,7 @@ ProblemService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(problem_entity_1.Problem)),
     __param(1, (0, typeorm_1.InjectRepository)(problem_reaction_entity_1.ProblemReaction)),
-    __param(2, (0, common_1.Inject)(common_1.CACHE_MANAGER)),
+    __param(2, (0, common_1.Inject)(cache_manager_1.CACHE_MANAGER)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         typeorm_2.Repository, Object])
 ], ProblemService);

@@ -7,7 +7,7 @@ import { Cache } from 'cache-manager';
 export declare class ProblemService {
     private readonly problemRepository;
     private readonly problemReactionRepository;
-    private cacheManager;
+    private readonly cacheManager;
     constructor(problemRepository: Repository<Problem>, problemReactionRepository: Repository<ProblemReaction>, cacheManager: Cache);
     create(data: DeepPartial<Problem>): Promise<Problem>;
     findMany(options: ProblemQueryDto): Promise<Problem[]>;

@@ -14,13 +14,10 @@ import { CaslModule } from './casl/casl.module';
 import { FileModule } from './file/file.module';
 import { PoliciesGuard } from './blocks/guards/policies.guard';
 import { EmailConfirmationGuard } from './blocks/guards/email-confirmation.guard';
-import { CacheModule } from '@nestjs/cache-manager';
 import { HealthModule } from './health/health.module';
 import { BullModule } from '@nestjs/bull';
 
-import * as redisStore from 'cache-manager-redis-store';
 import config from './config';
-
 // import { queryLogger } from './logger';
 
 @Module({
@@ -28,12 +25,6 @@ import config from './config';
 		TypeOrmModule.forRoot({
 			...config.dbConfig,
 			// logger: queryLogger,
-		}),
-		CacheModule.register<any>({
-			isGlobal: true,
-			store: redisStore,
-			socket: config.redisCacheConfig,
-			ttl: 5000,
 		}),
 		BullModule.forRoot({
 			redis: {

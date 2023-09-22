@@ -4,7 +4,7 @@ export declare const Verdict: {
     readonly Timeout: "Timeout";
     readonly Error: "Error";
 };
-export declare type TVerdict = typeof Verdict[keyof typeof Verdict];
+export type TVerdict = typeof Verdict[keyof typeof Verdict];
 export declare class ResponseCompilerDto {
     verdict: TVerdict;
     info?: string | undefined;

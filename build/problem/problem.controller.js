@@ -27,6 +27,7 @@ const casl_types_type_1 = require("../casl/types/casl-types.type");
 const swagger_1 = require("@nestjs/swagger");
 const get_current_userId_decorator_1 = require("../blocks/decorators/get-current-userId.decorator");
 const toggle_reaction_dto_1 = require("./dto/toggle-reaction.dto");
+const cache_manager_1 = require("@nestjs/cache-manager");
 let ProblemController = class ProblemController {
     constructor(problemService) {
         this.problemService = problemService;
@@ -38,7 +39,6 @@ let ProblemController = class ProblemController {
         const problems = await this.problemService.findMany(query);
         if (!problems.length)
             throw new common_1.NotFoundException(problem_constants_1.PROBLEMS_NOT_FOUND_ERROR);
-        console.log('hello');
         return problems;
     }
     async findOne(id) {
@@ -64,7 +64,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ProblemController.prototype, "create", null);
 __decorate([
-    (0, common_1.UseInterceptors)(common_1.CacheInterceptor),
+    (0, common_1.UseInterceptors)(cache_manager_1.CacheInterceptor),
+    (0, common_1.CacheTTL)(1000 * 60),
     (0, common_1.Get)(),
     (0, check_policies_decorator_1.CheckPolicies)(new policy_handler_1.PolicyHandler(casl_types_type_1.Action.ReadMany, problem_entity_1.Problem)),
     openapi.ApiResponse({ status: 200, type: [require("./entities/problem.entity").Problem] }),

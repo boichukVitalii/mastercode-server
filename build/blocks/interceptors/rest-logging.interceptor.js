@@ -38,6 +38,7 @@ class RestLoggingInterceptor {
             url: request.url,
             body: request.body,
         };
+        logger_1.default.debug(params, `Request started`);
         const startedAt = process.hrtime.bigint();
         return next.handle().pipe((0, operators_1.catchError)((err) => {
             if (err instanceof common_1.HttpException) {
@@ -48,6 +49,8 @@ class RestLoggingInterceptor {
             }
             logger_1.default.error({ ...params, duration: this.fromStarted(startedAt), err }, `Request finished with error`);
             return (0, rxjs_1.throwError)(() => err);
+        }), (0, operators_1.tap)(() => {
+            logger_1.default.debug({ ...params, duration: this.fromStarted(startedAt) }, `Request finished`);
         }));
     }
     fromStarted(startedAt) {

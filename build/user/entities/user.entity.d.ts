@@ -7,7 +7,7 @@ export declare const UserRole: {
     readonly USER: "user";
     readonly ADMIN: "admin";
 };
-export declare type TUserRole = typeof UserRole[keyof typeof UserRole];
+export type TUserRole = typeof UserRole[keyof typeof UserRole];
 export declare class User {
     id: string;
     first_name: string;

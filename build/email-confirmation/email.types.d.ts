@@ -1,3 +1,3 @@
-export declare type TVerificationTokenPayload = {
+export type TVerificationTokenPayload = {
     email: string;
 };

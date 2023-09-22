@@ -23,7 +23,7 @@ export class RestLoggingInterceptor implements NestInterceptor {
 			body: request.body,
 		};
 
-		// logger.debug(params, `Request started`);
+		logger.debug(params, `Request started`);
 		const startedAt = process.hrtime.bigint();
 
 		return next.handle().pipe(
@@ -44,9 +44,9 @@ export class RestLoggingInterceptor implements NestInterceptor {
 				// return throwError(() => new InternalServerErrorException(err.message));
 				return throwError(() => err);
 			}),
-			// tap(() => {
-			// 	logger.debug({ ...params, duration: this.fromStarted(startedAt) }, `Request finished`);
-			// }),
+			tap(() => {
+				logger.debug({ ...params, duration: this.fromStarted(startedAt) }, `Request finished`);
+			}),
 		);
 	}
 

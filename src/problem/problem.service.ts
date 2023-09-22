@@ -1,4 +1,4 @@
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
 import { Problem } from './entities/problem.entity';
@@ -7,6 +7,7 @@ import { EntityNotFoundCustomError } from '../errors/custom-errors';
 import { PROBLEM_NOT_FOUND_ERROR } from './problem.constants';
 import { ToggleReactionResponseDto } from './dto/toggle-reaction-response.dto';
 import { ProblemQueryDto } from './dto/problem-query.dto';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 
 @Injectable()
@@ -16,7 +17,7 @@ export class ProblemService {
 		private readonly problemRepository: Repository<Problem>,
 		@InjectRepository(ProblemReaction)
 		private readonly problemReactionRepository: Repository<ProblemReaction>,
-		@Inject(CACHE_MANAGER) private cacheManager: Cache,
+		@Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
 	) {}
 
 	async create(data: DeepPartial<Problem>): Promise<Problem> {
@@ -26,10 +27,6 @@ export class ProblemService {
 
 	async findMany(options: ProblemQueryDto): Promise<Problem[]> {
 		const { skip, take, category, difficulty, title } = options;
-		await this.cacheManager.store.set('key', 1);
-		const key = await this.cacheManager.store.get('key');
-		console.log(key);
-		console.log('many');
 		return await this.problemRepository.find({
 			skip: skip,
 			take: take,

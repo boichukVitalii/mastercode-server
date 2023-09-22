@@ -24,6 +24,7 @@ import { PROBLEM_NOT_FOUND_ERROR } from '../src/problem/problem.constants';
 import { NO_ADD_INFO_ABOUT_ERROR_MSG } from '../src/blocks/filters/filter.constants';
 import { TFilterResponseBody } from '../src/blocks/filters/filter.type';
 import loggerMock from '../src/mocks/mocks';
+import { CacheModule } from '@nestjs/cache-manager';
 // import { UpdateProblemDto } from '../src/problem/dto/update-problem.dto';
 
 const userSignUp: any = {
@@ -51,20 +52,12 @@ describe('[Feature] Problem - /problem', () => {
 				AuthModule,
 				CaslModule,
 				TypeOrmModule.forRoot({ ...config.dbTestConfig }),
+				CacheModule.register(),
 			],
 			providers: [
-				{
-					provide: APP_GUARD,
-					useClass: AccessTokenGuard,
-				},
-				{
-					provide: APP_GUARD,
-					useClass: EmailConfirmationGuard,
-				},
-				{
-					provide: APP_GUARD,
-					useClass: PoliciesGuard,
-				},
+				{ provide: APP_GUARD, useClass: AccessTokenGuard },
+				{ provide: APP_GUARD, useClass: EmailConfirmationGuard },
+				{ provide: APP_GUARD, useClass: PoliciesGuard },
 			],
 		}).compile();
 

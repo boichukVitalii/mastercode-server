@@ -7,7 +7,7 @@ export declare const ProblemDifficulty: {
     readonly MEDIUM: "medium";
     readonly HARD: "hard";
 };
-export declare type TProblemDifficulty = typeof ProblemDifficulty[keyof typeof ProblemDifficulty];
+export type TProblemDifficulty = typeof ProblemDifficulty[keyof typeof ProblemDifficulty];
 export declare class Problem {
     id: string;
     title: string;

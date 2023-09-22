@@ -16,9 +16,7 @@ const dbConfig: PostgresConnectionOptions = {
 	logging: false,
 	url: process.env.DB_URL,
 	entities: [join(__dirname, `/**/**.entity{.ts,.js}`)],
-	extra: {
-		application_name: 'mastercode',
-	},
+	extra: { application_name: 'mastercode' },
 	migrationsRun: true,
 	migrationsTableName: 'migrations',
 	migrations: [migrationsDir],

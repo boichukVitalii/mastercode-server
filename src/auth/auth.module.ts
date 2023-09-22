@@ -10,8 +10,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PasswordResetToken } from './entities/password-reset-token.entity';
 import { GoogleAuthService } from './social/google-authentication.service';
 import { HashingService } from './hashing/hashing.service';
-import { BcryptService } from './hashing/bcrypt.service';
-//import { ScryptService } from './hashing/scrypt.service';
+// import { BcryptService } from './hashing/bcrypt.service';
+import { ScryptService } from './hashing/scrypt.service';
 
 @Module({
 	imports: [
@@ -29,7 +29,7 @@ import { BcryptService } from './hashing/bcrypt.service';
 		GoogleAuthService,
 		{
 			provide: HashingService,
-			useClass: BcryptService,
+			useClass: ScryptService,
 		},
 	],
 })

@@ -15,9 +15,7 @@ const dbConfig = {
     logging: false,
     url: process.env.DB_URL,
     entities: [(0, node_path_1.join)(__dirname, `/**/**.entity{.ts,.js}`)],
-    extra: {
-        application_name: 'mastercode',
-    },
+    extra: { application_name: 'mastercode' },
     migrationsRun: true,
     migrationsTableName: 'migrations',
     migrations: [migrationsDir],

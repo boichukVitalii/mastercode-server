@@ -1,16 +1,16 @@
 import { TUserRole, User } from '../../user/entities/user.entity';
 import { AuthResponseDto } from '../dto/auth-response.dto';
-export declare type TTokens = {
+export type TTokens = {
     accessToken: string;
     refreshToken: string;
 };
-export declare type TJwtPayload = {
+export type TJwtPayload = {
     sub: string;
     email: string;
     roles: TUserRole[];
     isEmailConfirmed: boolean;
 };
-export declare type TAuthResponse = {
+export type TAuthResponse = {
     user: AuthResponseDto | User;
     tokens: TTokens;
 };

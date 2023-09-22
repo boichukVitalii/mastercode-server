@@ -19,7 +19,7 @@ const typeorm_1 = require("@nestjs/typeorm");
 const password_reset_token_entity_1 = require("./entities/password-reset-token.entity");
 const google_authentication_service_1 = require("./social/google-authentication.service");
 const hashing_service_1 = require("./hashing/hashing.service");
-const bcrypt_service_1 = require("./hashing/bcrypt.service");
+const scrypt_service_1 = require("./hashing/scrypt.service");
 let AuthModule = class AuthModule {
 };
 AuthModule = __decorate([
@@ -39,7 +39,7 @@ AuthModule = __decorate([
             google_authentication_service_1.GoogleAuthService,
             {
                 provide: hashing_service_1.HashingService,
-                useClass: bcrypt_service_1.BcryptService,
+                useClass: scrypt_service_1.ScryptService,
             },
         ],
     })

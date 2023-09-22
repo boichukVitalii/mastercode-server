@@ -1,5 +1,5 @@
 import { TLanguage } from '../../user/entities/user-solved-problem.entity';
-export declare type CodeType = {
+export type CodeType = {
     type: 'Buffer';
     data: Array<number>;
 };

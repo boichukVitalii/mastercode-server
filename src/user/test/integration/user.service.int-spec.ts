@@ -12,6 +12,7 @@ import { createProblemStub } from '../../../problem/test/stubs/problem.stub';
 import { Problem } from '../../../problem/entities/problem.entity';
 import { CategoryService } from '../../../category/category.service';
 import { CategoryModule } from '../../../category/category.module';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 describe('UserService Integration', () => {
 	let userService: UserService;
@@ -23,6 +24,7 @@ describe('UserService Integration', () => {
 	beforeAll(async () => {
 		const moduleFixture: TestingModule = await Test.createTestingModule({
 			imports: [UserModule, CategoryModule, TypeOrmModule.forRoot({ ...config.dbTestConfig })],
+			providers: [{ provide: CACHE_MANAGER, useValue: {} }],
 		}).compile();
 
 		userService = moduleFixture.get(UserService);

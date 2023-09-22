@@ -1,0 +1,27 @@
+name: Check
+on: push
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      -name: Checkout
+       uses: actions/checkout@v4
+      -name: Install deps
+        run: npm ci
+      -name: Lint
+        run: npm run lint
+  test:
+    needs: [lint]
+    runs-on: ubuntu-latest
+    steps:
+      -name: Checkout
+       uses: actions/checkout@v4
+      -name: Install deps
+        run: npm ci
+      -name: Unit tests
+        run: npm run test
+      -name: Integration tests
+        run: npm run test:int
+      -name: E2E tests
+        run: npm run test:e2e
+    

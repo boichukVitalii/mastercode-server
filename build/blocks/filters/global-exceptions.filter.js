@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GlobalExceptionFilter = void 0;
 const common_1 = require("@nestjs/common");
+const core_1 = require("@nestjs/core");
 const custom_errors_1 = require("../../errors/custom-errors");
 const typeorm_1 = require("typeorm");
 const filter_constants_1 = require("./filter.constants");
@@ -59,7 +60,7 @@ let GlobalExceptionFilter = class GlobalExceptionFilter {
 };
 GlobalExceptionFilter = __decorate([
     (0, common_1.Catch)(),
-    __metadata("design:paramtypes", [Object, Object])
+    __metadata("design:paramtypes", [core_1.HttpAdapterHost, Object])
 ], GlobalExceptionFilter);
 exports.GlobalExceptionFilter = GlobalExceptionFilter;
 //# sourceMappingURL=global-exceptions.filter.js.map

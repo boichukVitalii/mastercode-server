@@ -22,6 +22,7 @@ export class CompilerProcessor {
 			await this.userService.addSolvedProblem({
 				problem_id: problemId,
 				user_id: job.data.userId,
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 				run_time: result.runTime!,
 				language: lang,
 			});

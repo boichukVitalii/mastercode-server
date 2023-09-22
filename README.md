@@ -2,22 +2,21 @@
 
 ## Description
 
-You see the server side of a Mastercode web application.
-**Mastercode** is an educational web platform that pursues the goal of helping programmers become better by solving different problems on the provided playground page. You may know similar platforms such as LeetCode, CodeWars, etc.
-The purpose of creation of the platform was, first of all, a desire to understand how such platforms as LeetCode work under the hood (specifically how they run and test users' code and how they do it securely for servers that host their backend application) and secondly to master common backend developer issues (such as Authentication/Authorization, RBAC/Claim-based authorization, email service integration, convenient errors handling, work with database, caching, testing and so on...).
+In this repository you can see the server side of a Mastercode web application.
+**Mastercode** is an educational web platform that pursues the goal of helping programmers become better by solving different problems on the provided "training area" page. You may know similar platforms such as LeetCode, CodeWars, Coderbyte.
 
-##Technologies used:
+##Technologies and libraries used in the project:
 
 - Node.js
 - Nest.js
 - PostgreSQL
 - Redis
 - Docker
-- Other (TypeOrm, Bull, Passport, Casl, Swagger...)
+- Other (TypeOrm, Bull, Passport, Casl, Nodemailer, Pino, Swagger...)
 
 ## Physical diagram of the Mastercode database
 
-![database diagram](./docs/mastercode-db-schema.png)
+![database diagram](./docs/mastercode-schema-db.png)
 
 ## Installation
 
@@ -44,13 +43,12 @@ $ npm run start:prod
 # unit tests
 $ npm run test
 
+# integration tests
+$ npm run test:int
+
 # e2e tests
 $ npm run test:e2e
 
 # test coverage
 $ npm run test:cov
 ```
-
-## License
-
-Mastercode is [MIT licensed](LICENSE).
